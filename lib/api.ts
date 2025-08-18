@@ -120,6 +120,7 @@ export const productService = {
     limit?: number;
     search?: string;
     category?: string;
+    subcategory?: string;
     stock_filter?: string;
     sort_by?: string;
     sort_direction?: string;
@@ -129,6 +130,7 @@ export const productService = {
     if (params?.limit) searchParams.append('limit', params.limit.toString());
     if (params?.search) searchParams.append('search', params.search);
     if (params?.category) searchParams.append('category', params.category);
+    if (params?.subcategory) searchParams.append('subcategory', params.subcategory);
     if (params?.stock_filter) searchParams.append('stock_filter', params.stock_filter);
     // Mapear parámetros del frontend a los que espera el backend
     if (params?.sort_by) searchParams.append('orderBy', params.sort_by);
@@ -154,6 +156,11 @@ export const productService = {
     return apiRequest(`/products/${id}`, {
       method: 'DELETE',
     });
+  },
+
+  getFeatured: async (limit?: number): Promise<ApiResponse> => {
+    const params = limit ? `?limit=${limit}` : '';
+    return apiRequest(`/products/featured${params}`);
   },
 };
 
@@ -259,6 +266,37 @@ export const subcategoryService = {
   },
 };
 
+// Servicio para gestión de usuarios (solo superadmin)
+export const userService = {
+  getUsers: async (): Promise<ApiResponse> => {
+    return apiRequest('/users');
+  },
+
+  getUserById: async (id: string): Promise<ApiResponse> => {
+    return apiRequest(`/users/${id}`);
+  },
+
+  createUser: async (userData: { name: string; email: string; password: string; role?: string }): Promise<ApiResponse> => {
+    return apiRequest('/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  },
+
+  updateUser: async (id: number, userData: { name: string; email: string; role?: string }): Promise<ApiResponse> => {
+    return apiRequest(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+  },
+
+  deleteUser: async (id: number): Promise<ApiResponse> => {
+    return apiRequest(`/users/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
 // Helper para manejar errores de token expirado
 export const handleAuthError = (error: any) => {
   if (error.message?.includes('Token inválido') || error.message?.includes('Token de acceso requerido')) {
@@ -270,12 +308,24 @@ export const handleAuthError = (error: any) => {
 
 // Helper para obtener URL completa de imagen [[memory:5282313]]
 export const getImageUrl = (imagePath: string | null): string => {
-  if (!imagePath) return '/placeholder-product.svg';
+  if (!imagePath) {
+    return 'https://via.placeholder.com/300x200/e5e7eb/6b7280?text=Sin+imagen';
+  }
   
+  // Si ya es una URL completa, devolverla tal como está
   if (imagePath.startsWith('http')) {
     return imagePath;
   }
   
+  // Construir URL completa
   const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3006';
-  return `${baseUrl}${imagePath}`;
+  
+  // Si imagePath ya empieza con /, no agregar otra /
+  const fullUrl = imagePath.startsWith('/') 
+    ? `${baseUrl}${imagePath}` 
+    : `${baseUrl}/${imagePath}`;
+  
+  console.log('🖼️ Image URL constructed:', { imagePath, baseUrl, fullUrl });
+  
+  return fullUrl;
 };

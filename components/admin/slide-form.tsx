@@ -35,6 +35,8 @@ export default function SlideForm({
     image: null,
     link: "",
     is_active: true,
+    show_title: true,
+    show_subtitle: true,
   });
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -52,6 +54,8 @@ export default function SlideForm({
         image: null,
         link: slide.link ?? "",
         is_active: slide.is_active,
+        show_title: slide.show_title !== undefined ? !!slide.show_title : true,
+        show_subtitle: slide.show_subtitle !== undefined ? !!slide.show_subtitle : true,
       });
       setPreviewImage(slide.image_url ? getImageUrl(slide.image_url) : null);
     } else {
@@ -62,6 +66,8 @@ export default function SlideForm({
         image: null,
         link: "",
         is_active: true,
+        show_title: true,
+        show_subtitle: true,
       });
       setPreviewImage(null);
     }
@@ -142,11 +148,13 @@ export default function SlideForm({
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-
-    if (formData.title.length > 255) {
+    
+    // Título es opcional, solo validar longitud si se proporciona
+    if (formData.title && formData.title.length > 255) {
       newErrors.title = "El título no puede exceder 255 caracteres";
     }
-
+    
+    // Subtítulo es opcional, solo validar longitud si se proporciona
     if (formData.subtitle && formData.subtitle.length > 1000) {
       newErrors.subtitle = "El subtítulo no puede exceder 1000 caracteres";
     }
@@ -183,8 +191,9 @@ export default function SlideForm({
       apiFormData.append("title", formData.title.trim());
       apiFormData.append("subtitle", formData.subtitle?.trim() || "");
       apiFormData.append("link", formData.link?.trim() || "");
-      apiFormData.append("is_active", formData.is_active.toString());
-
+  apiFormData.append("is_active", formData.is_active ? "true" : "false");
+      apiFormData.append("show_title", formData.show_title ? "1" : "0");
+      apiFormData.append("show_subtitle", formData.show_subtitle ? "1" : "0");
       if (formData.image) {
         apiFormData.append("image", formData.image);
       }
@@ -231,12 +240,12 @@ export default function SlideForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="subtitle">Subtítulo</Label>
+          <Label htmlFor="subtitle">Subtítulo (opcional)</Label>
           <Textarea
             id="subtitle"
             value={formData.subtitle}
             onChange={(e) => handleInputChange("subtitle", e.target.value)}
-            placeholder="Descripción o subtítulo del slide..."
+            placeholder="Descripción o subtítulo del slide (opcional)..."
             rows={2}
             className={errors.subtitle ? "border-red-500" : ""}
           />
@@ -270,7 +279,7 @@ export default function SlideForm({
       {/* Settings */}
       <div className="space-y-2">
         <Label htmlFor="is_active">Estado</Label>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 mb-2">
           <input
             id="is_active"
             type="checkbox"
@@ -280,6 +289,28 @@ export default function SlideForm({
           />
           <Label htmlFor="is_active" className="text-sm font-normal">
             Slide activo (visible en el carousel)
+          </Label>
+        </div>
+        <div className="flex items-center space-x-4">
+          <input
+            id="show_title"
+            type="checkbox"
+            checked={formData.show_title}
+            onChange={(e) => handleInputChange("show_title", e.target.checked)}
+            className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+          />
+          <Label htmlFor="show_title" className="text-sm font-normal">
+            Mostrar título
+          </Label>
+          <input
+            id="show_subtitle"
+            type="checkbox"
+            checked={formData.show_subtitle}
+            onChange={(e) => handleInputChange("show_subtitle", e.target.checked)}
+            className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+          />
+          <Label htmlFor="show_subtitle" className="text-sm font-normal">
+            Mostrar subtítulo
           </Label>
         </div>
       </div>

@@ -31,6 +31,7 @@ export default function ProductForm({
     stock: 0,
     category_id: 0,
     subcategory_id: null,
+    featured: false,
     image: null,
     images: [],
   });
@@ -53,12 +54,14 @@ export default function ProductForm({
         stock: product.stock,
         category_id: product.category_id,
         subcategory_id: product.subcategory_id,
+        featured: Boolean(product.featured),
         image: null,
         images: [],
       });
-      
+
       // Configurar imágenes de vista previa
-      const existingImages = product.images?.map(img => getImageUrl(img.image_url)) || [];
+      const existingImages =
+        product.images?.map((img) => getImageUrl(img.image_url)) || [];
       if (existingImages.length === 0 && product.image_url) {
         existingImages.push(getImageUrl(product.image_url));
       }
@@ -76,6 +79,7 @@ export default function ProductForm({
         price: 0,
         stock: 0,
         category_id: 0,
+        featured: false,
         subcategory_id: null,
         image: null,
         images: [],
@@ -123,15 +127,17 @@ export default function ProductForm({
   // Image validation
   const validateImage = (file: File): boolean => {
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 2 * 1024 * 1024; // 2MB
 
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Tipo de archivo no válido. Solo se permiten JPEG, PNG y WebP.");
+      toast.error(
+        "Tipo de archivo no válido. Solo se permiten JPEG, PNG y WebP."
+      );
       return false;
     }
 
     if (file.size > maxSize) {
-      toast.error("El archivo es demasiado grande. Máximo 5MB.");
+      toast.error("El archivo es demasiado grande. Máximo 2MB.");
       return false;
     }
 
@@ -142,19 +148,19 @@ export default function ProductForm({
   const validateImages = (files: FileList): File[] => {
     const validFiles: File[] = [];
     const maxImages = 5;
-    
+
     if (files.length > maxImages) {
       toast.error(`Máximo ${maxImages} imágenes permitidas.`);
       return [];
     }
-    
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (validateImage(file)) {
         validFiles.push(file);
       }
     }
-    
+
     return validFiles;
   };
 
@@ -163,20 +169,22 @@ export default function ProductForm({
     const files = event.target.files;
     if (files && files.length > 0) {
       const validFiles = validateImages(files);
-      
+
       if (validFiles.length > 0) {
         // Combinar con imágenes existentes, máximo 5 total
         const currentImages = formData.images || [];
         const totalImages = currentImages.length + validFiles.length;
-        
+
         if (totalImages > 5) {
-          toast.error(`Solo puedes tener máximo 5 imágenes. Actualmente tienes ${currentImages.length}.`);
+          toast.error(
+            `Solo puedes tener máximo 5 imágenes. Actualmente tienes ${currentImages.length}.`
+          );
           return;
         }
-        
+
         const newImages = [...currentImages, ...validFiles];
         setFormData({ ...formData, images: newImages });
-        
+
         // Create previews for new images
         const newPreviews: string[] = [];
         validFiles.forEach((file, index) => {
@@ -184,7 +192,7 @@ export default function ProductForm({
           reader.onload = (e) => {
             newPreviews.push(e.target?.result as string);
             if (newPreviews.length === validFiles.length) {
-              setPreviewImages(prev => [...prev, ...newPreviews]);
+              setPreviewImages((prev) => [...prev, ...newPreviews]);
             }
           };
           reader.readAsDataURL(file);
@@ -213,20 +221,22 @@ export default function ProductForm({
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       const validFiles = validateImages(files);
-      
+
       if (validFiles.length > 0) {
         // Combinar con imágenes existentes, máximo 5 total
         const currentImages = formData.images || [];
         const totalImages = currentImages.length + validFiles.length;
-        
+
         if (totalImages > 5) {
-          toast.error(`Solo puedes tener máximo 5 imágenes. Actualmente tienes ${currentImages.length}.`);
+          toast.error(
+            `Solo puedes tener máximo 5 imágenes. Actualmente tienes ${currentImages.length}.`
+          );
           return;
         }
-        
+
         const newImages = [...currentImages, ...validFiles];
         setFormData({ ...formData, images: newImages });
-        
+
         // Create previews for new images
         const newPreviews: string[] = [];
         validFiles.forEach((file, index) => {
@@ -234,7 +244,7 @@ export default function ProductForm({
           reader.onload = (e) => {
             newPreviews.push(e.target?.result as string);
             if (newPreviews.length === validFiles.length) {
-              setPreviewImages(prev => [...prev, ...newPreviews]);
+              setPreviewImages((prev) => [...prev, ...newPreviews]);
             }
           };
           reader.readAsDataURL(file);
@@ -247,11 +257,11 @@ export default function ProductForm({
   const removeImage = (index: number) => {
     const newImages = formData.images?.filter((_, i) => i !== index) || [];
     const newPreviews = previewImages.filter((_, i) => i !== index);
-    
+
     setFormData({ ...formData, images: newImages });
     setPreviewImages(newPreviews);
   };
-  
+
   // Remove all images
   const removeAllImages = () => {
     setFormData({ ...formData, images: [] });
@@ -310,6 +320,7 @@ export default function ProductForm({
       apiFormData.append("price", formData.price.toString());
       apiFormData.append("stock", formData.stock.toString());
       apiFormData.append("category_id", formData.category_id.toString());
+      apiFormData.append("featured", formData.featured ? "1" : "0");
 
       if (formData.subcategory_id) {
         apiFormData.append(
@@ -428,6 +439,26 @@ export default function ProductForm({
         </div>
       </div>
 
+      {/* Featured Product */}
+      <div className="space-y-2">
+        <div className="flex items-center space-x-2">
+          <input
+            id="featured"
+            type="checkbox"
+            checked={formData.featured}
+            onChange={(e) => handleInputChange("featured", e.target.checked)}
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <Label htmlFor="featured" className="text-sm font-medium">
+            Producto Destacado
+          </Label>
+        </div>
+        <p className="text-xs text-gray-500">
+          Los productos destacados aparecerán en la sección principal de la
+          página de inicio
+        </p>
+      </div>
+
       {/* Category and Subcategory */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -507,19 +538,22 @@ export default function ProductForm({
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
             >
-              <ImageIcon className={`h-12 w-12 mx-auto mb-4 transition-colors ${
-                isDragOver ? "text-blue-500" : "text-gray-400"
-              }`} />
-              <p className={`mb-2 transition-colors ${
-                isDragOver ? "text-blue-700 font-medium" : "text-gray-600"
-              }`}>
-                {isDragOver 
-                  ? "Suelta las imágenes aquí" 
-                  : "Arrastra y suelta imágenes o haz clic para seleccionar"
-                }
+              <ImageIcon
+                className={`h-12 w-12 mx-auto mb-4 transition-colors ${
+                  isDragOver ? "text-blue-500" : "text-gray-400"
+                }`}
+              />
+              <p
+                className={`mb-2 transition-colors ${
+                  isDragOver ? "text-blue-700 font-medium" : "text-gray-600"
+                }`}
+              >
+                {isDragOver
+                  ? "Suelta las imágenes aquí"
+                  : "Arrastra y suelta imágenes o haz clic para seleccionar"}
               </p>
               <p className="text-sm text-gray-500">
-                PNG, JPG, JPEG hasta 5MB cada una. Máximo 5 imágenes.
+                PNG, JPG, JPEG hasta 2MB cada una. Máximo 5 imágenes.
               </p>
               {previewImages.length > 0 && (
                 <p className="text-sm text-blue-600 mt-2">
@@ -527,7 +561,7 @@ export default function ProductForm({
                 </p>
               )}
             </div>
-            
+
             <input
               ref={fileInputRef}
               type="file"
@@ -536,7 +570,7 @@ export default function ProductForm({
               onChange={handleImagesSelect}
               className="hidden"
             />
-            
+
             <Button
               type="button"
               variant="outline"
@@ -544,9 +578,11 @@ export default function ProductForm({
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="h-4 w-4 mr-2" />
-              {previewImages.length > 0 ? "Agregar más imágenes" : "Seleccionar Imágenes"}
+              {previewImages.length > 0
+                ? "Agregar más imágenes"
+                : "Seleccionar Imágenes"}
             </Button>
-            
+
             {/* Images Preview Grid */}
             {previewImages.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">

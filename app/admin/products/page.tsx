@@ -612,6 +612,7 @@ export default function ProductsPage() {
                         </Button>
                       </TableHead>
                       <TableHead>Estado</TableHead>
+                      <TableHead>Destacado</TableHead>
                       <TableHead className="w-20">Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -717,6 +718,14 @@ export default function ProductsPage() {
                             </span>
                           </TableCell>
                           <TableCell>{getStockBadge(product.stock)}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={product.featured === 1 ? "default" : "secondary"}
+                              className={product.featured === 1 ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+                            >
+                              {product.featured === 1 ? "Destacado" : "Normal"}
+                            </Badge>
+                          </TableCell>
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>

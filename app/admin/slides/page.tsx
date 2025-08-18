@@ -168,6 +168,9 @@ export default function SlidesPage() {
       formData.append("subtitle", slide.subtitle || "");
       formData.append("link", slide.link || "");
       formData.append("is_active", newStatus ? "true" : "false");
+      // Incluir los campos show_title y show_subtitle para preservar su estado
+      formData.append("show_title", slide.show_title ? "1" : "0");
+      formData.append("show_subtitle", slide.show_subtitle ? "1" : "0");
 
       const response = await slideService.update(slide.id.toString(), formData);
       if (response.success) {
@@ -418,7 +421,7 @@ export default function SlidesPage() {
                           <TableCell>
                             <div className="max-w-sm">
                               <p className="font-semibold text-gray-900 truncate">
-                                {slide.title}
+                                {slide.title && slide.title.trim() ? slide.title : "Sin título"}
                               </p>
                             </div>
                           </TableCell>

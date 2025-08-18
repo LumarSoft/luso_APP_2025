@@ -7,13 +7,25 @@ import { Product, HomePageData, ProductDisplay, Slide } from "@/lib/types";
 
 // Helper function to convert API Product to legacy ProductDisplay format
 const convertProductToDisplay = (product: Product): ProductDisplay => {
-  // Product conversion completed successfully
-  
   // Manejar las imágenes con fallback apropiado
-  const primaryImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0].image_url : null);
-  const allImages = product.images && product.images.length > 0 
-    ? product.images.map(img => getImageUrl(img.image_url))
-    : (product.image_url ? [getImageUrl(product.image_url)] : []);
+  const primaryImage =
+    product.image_url ||
+    (product.images && product.images.length > 0
+      ? product.images[0].image_url
+      : null);
+
+  const allImages =
+    product.images && product.images.length > 0
+      ? product.images.map((img) => getImageUrl(img.image_url))
+      : product.image_url
+      ? [getImageUrl(product.image_url)]
+      : [];
+
+  console.log("🔄 Product processed:", {
+    name: product.name,
+    primaryImage,
+    allImages,
+  });
 
   return {
     id: product.id.toString(),
@@ -22,25 +34,34 @@ const convertProductToDisplay = (product: Product): ProductDisplay => {
     price: product.price,
     image: getImageUrl(primaryImage),
     images: allImages,
-    category: product.category_name || 'Sin categoría',
+    category: product.category_name || "Sin categoría",
     inStock: Number(product.stock) > 0, // Asegurar conversión a número
-    isFeature: true // For featured products
+    isFeature: true, // For featured products
   };
 };
 
 // Helper function to convert API Slide to legacy HeaderSlide format
-const convertSlideToHeaderSlide = (slide: Slide) => ({
-  id: slide.id.toString(),
-  image: getImageUrl(slide.image_url),
-  title: slide.title || undefined,
-  subtitle: slide.subtitle || undefined,
-  link: slide.link || undefined
-});
+const convertSlideToHeaderSlide = (slide: Slide) => {
+  console.log("🎠 Converting slide to header slide:", slide);
+  const imageUrl = getImageUrl(slide.image_url);
+  console.log("🎠 Processed slide image URL:", imageUrl);
+
+  return {
+    id: slide.id.toString(),
+    image: imageUrl,
+    title: slide.title || undefined,
+    subtitle: slide.subtitle || undefined,
+    link: slide.link || undefined,
+    show_title: slide.show_title !== undefined ? !!slide.show_title : true,
+    show_subtitle:
+      slide.show_subtitle !== undefined ? !!slide.show_subtitle : true,
+  };
+};
 
 export default function Home() {
   const [homePageData, setHomePageData] = useState<HomePageData>({
     headerSlides: [],
-    featuredProducts: []
+    featuredProducts: [],
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -48,59 +69,59 @@ export default function Home() {
   useEffect(() => {
     const loadHomeData = async () => {
       try {
+        console.log("🏠 Loading home data...");
         const [slidesResponse, productsResponse] = await Promise.all([
           slideService.getActive(),
-          productService.getAll({ limit: 12 })
+          productService.getFeatured(8),
         ]);
+
+        console.log("🏠 Slides response:", slidesResponse);
+        console.log("🏠 Products response:", productsResponse);
 
         let headerSlides = [];
         let featuredProducts = [];
 
         // Procesar slides
         if (slidesResponse.success && slidesResponse.data.slides) {
-          headerSlides = slidesResponse.data.slides.map(convertSlideToHeaderSlide);
+          console.log("🏠 Processing slides:", slidesResponse.data.slides);
+          headerSlides = slidesResponse.data.slides.map(
+            convertSlideToHeaderSlide
+          );
         }
 
-        // Si no hay slides de la API, usar uno por defecto
-        if (headerSlides.length === 0) {
-          headerSlides = [
-            {
-              id: "default",
-              image: "https://via.placeholder.com/1200x500/2563eb/ffffff?text=LusoInsumos+-+Tu+tienda+de+confianza",
-              title: "Bienvenido a LusoInsumos",
-              subtitle: "Tu tienda de confianza para productos de calidad",
-              link: "#productos"
-            }
-          ];
-        }
-
-        // Procesar productos
+        // Procesar productos destacados
         if (productsResponse.success && productsResponse.data.products) {
-          // Tomar máximo 8 productos (ya no filtramos por imagen ya que tenemos placeholder)
-          const products = productsResponse.data.products.slice(0, 8);
-          
-          featuredProducts = products.map(convertProductToDisplay);
+          console.log(
+            "🏠 Processing featured products:",
+            productsResponse.data.products
+          );
+          featuredProducts = productsResponse.data.products.map(
+            convertProductToDisplay
+          );
+        } else {
+          console.log("🏠 No featured products found or error in response");
         }
 
         setHomePageData({
           headerSlides,
-          featuredProducts
+          featuredProducts,
         });
-
       } catch (error) {
-        console.error('Error loading home data:', error);
+        console.error("Error loading home data:", error);
         // Use fallback slide if API fails
         setHomePageData({
           headerSlides: [
             {
               id: "fallback",
-              image: "https://via.placeholder.com/1200x500/2563eb/ffffff?text=LusoInsumos+-+Tu+tienda+de+confianza",
+              image: "/placeholder-product.jpg",
               title: "Bienvenido a LusoInsumos",
               subtitle: "Tu tienda de confianza para productos de calidad",
-              link: "#productos"
-            }
+              link: "/productos",
+              show_title: true,
+              show_subtitle: true,
+            },
           ],
-          featuredProducts: []
+          featuredProducts: [],
         });
       } finally {
         setIsLoading(false);
@@ -112,9 +133,22 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-gray-500">
-          Cargando...
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-7xl mx-auto">
+            {/* Skeleton de contenido en lugar de spinner grande */}
+            <div className="animate-pulse">
+              {/* Hero skeleton */}
+              <div className="h-96 bg-gray-200 rounded-xl mb-8"></div>
+
+              {/* Featured products skeleton */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map((item) => (
+                  <div key={item} className="bg-gray-200 h-80 rounded-xl"></div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

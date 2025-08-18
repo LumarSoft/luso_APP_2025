@@ -17,7 +17,7 @@ import {
   Home,
   Menu,
   X,
-  Monitor
+  Monitor,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -29,44 +29,46 @@ interface SidebarProps {
   };
 }
 
-const navigation = [
-  {
-    name: "Dashboard",
-    href: "/admin/dashboard",
-    icon: LayoutDashboard,
-    description: "Vista general"
-  },
-  {
-    name: "Productos",
-    href: "/admin/products",
-    icon: Package,
-    description: "Gestionar productos"
-  },
-  {
-    name: "Categorías",
-    href: "/admin/categories",
-    icon: Tags,
-    description: "Gestionar categorías"
-  },
-  {
-    name: "Slides",
-    href: "/admin/slides",
-    icon: Monitor,
-    description: "Gestionar carousel"
-  },
-  {
-    name: "Usuarios",
-    href: "/admin/users",
-    icon: Users,
-    description: "Gestionar administradores"
-  },
-  {
-    name: "Configuración",
-    href: "/admin/settings",
-    icon: Settings,
-    description: "Configuraciones"
+const getNavigation = (userRole?: string) => {
+  const baseNavigation = [
+    {
+      name: "Dashboard",
+      href: "/admin/dashboard",
+      icon: LayoutDashboard,
+      description: "Vista general",
+    },
+    {
+      name: "Productos",
+      href: "/admin/products",
+      icon: Package,
+      description: "Gestionar productos",
+    },
+    {
+      name: "Categorías",
+      href: "/admin/categories",
+      icon: Tags,
+      description: "Gestionar categorías",
+    },
+    {
+      name: "Slides",
+      href: "/admin/slides",
+      icon: Monitor,
+      description: "Gestionar carousel",
+    },
+  ];
+
+  // Solo mostrar gestión de usuarios al superadmin
+  if (userRole === 'superadmin') {
+    baseNavigation.push({
+      name: "Usuarios",
+      href: "/admin/users",
+      icon: Users,
+      description: "Gestionar administradores",
+    });
   }
-];
+
+  return baseNavigation;
+};
 
 export function Sidebar({ user }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -88,19 +90,23 @@ export function Sidebar({ user }: SidebarProps) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className={cn(
-        "flex items-center justify-between p-4 border-b border-gray-200",
-        collapsed ? "px-2" : "px-4"
-      )}>
+      <div
+        className={cn(
+          "flex items-center justify-between p-4 border-b border-gray-200",
+          collapsed ? "px-2" : "px-4"
+        )}
+      >
         {!collapsed && (
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Package className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-semibold text-gray-900">LusoInsumos</span>
+            <span className="text-lg font-semibold text-gray-900">
+              LusoInsumos
+            </span>
           </div>
         )}
-        
+
         {/* Toggle button - solo desktop */}
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -139,7 +145,7 @@ export function Sidebar({ user }: SidebarProps) {
         <div className="border-t border-gray-200 my-2"></div>
 
         {/* Menu items */}
-        {navigation.map((item) => {
+        {getNavigation(user?.role).map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -155,7 +161,9 @@ export function Sidebar({ user }: SidebarProps) {
               <item.icon
                 className={cn(
                   "mr-3 h-5 w-5 flex-shrink-0",
-                  isActive ? "text-primary-foreground" : "text-gray-400 group-hover:text-gray-500"
+                  isActive
+                    ? "text-primary-foreground"
+                    : "text-gray-400 group-hover:text-gray-500"
                 )}
               />
               {!collapsed && (
@@ -177,10 +185,12 @@ export function Sidebar({ user }: SidebarProps) {
           <div className="mb-4">
             <p className="text-sm font-medium text-gray-900">{user.name}</p>
             <p className="text-xs text-gray-500">{user.email}</p>
-            <p className="text-xs text-primary font-medium capitalize">{user.role}</p>
+            <p className="text-xs text-primary font-medium capitalize">
+              {user.role}
+            </p>
           </div>
         )}
-        
+
         <Button
           onClick={handleLogout}
           variant="ghost"
@@ -200,25 +210,29 @@ export function Sidebar({ user }: SidebarProps) {
     <>
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Mobile sidebar */}
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:hidden",
-        mobileOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:hidden",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
         <SidebarContent />
       </div>
 
       {/* Desktop sidebar */}
-      <div className={cn(
-        "hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:bg-white lg:border-r lg:border-gray-200 transition-all duration-300",
-        collapsed ? "lg:w-16" : "lg:w-64"
-      )}>
+      <div
+        className={cn(
+          "hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:bg-white lg:border-r lg:border-gray-200 transition-all duration-300",
+          collapsed ? "lg:w-16" : "lg:w-64"
+        )}
+      >
         <SidebarContent />
       </div>
 
@@ -231,4 +245,4 @@ export function Sidebar({ user }: SidebarProps) {
       </button>
     </>
   );
-} 
+}

@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Sidebar } from "@/components/admin/sidebar";
 import { authService, productService, categoryService } from "@/lib/api";
 import {
@@ -12,7 +18,7 @@ import {
   Users,
   DollarSign,
   AlertCircle,
-  Activity
+  Activity,
 } from "lucide-react";
 
 interface User {
@@ -35,7 +41,7 @@ export default function AdminDashboard() {
     totalProducts: 0,
     totalCategories: 0,
     lowStockProducts: 0,
-    recentProducts: 0
+    recentProducts: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -57,7 +63,9 @@ export default function AdminDashboard() {
           const categories = categoriesResponse.data.categories;
 
           // Calcular estadísticas
-          const lowStock = products.filter((product: any) => product.stock < 10).length;
+          const lowStock = products.filter(
+            (product: any) => product.stock < 10
+          ).length;
           const recent = products.filter((product: any) => {
             const createdAt = new Date(product.created_at);
             const weekAgo = new Date();
@@ -69,11 +77,11 @@ export default function AdminDashboard() {
             totalProducts: products.length,
             totalCategories: categories.length,
             lowStockProducts: lowStock,
-            recentProducts: recent
+            recentProducts: recent,
           });
         }
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error("Error loading dashboard data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -88,29 +96,29 @@ export default function AdminDashboard() {
       value: stats.totalProducts,
       description: "Productos en el catálogo",
       icon: Package,
-      color: "bg-blue-500"
+      color: "bg-blue-500",
     },
     {
       title: "Categorías",
       value: stats.totalCategories,
       description: "Categorías disponibles",
       icon: Tags,
-      color: "bg-green-500"
+      color: "bg-green-500",
     },
     {
       title: "Stock Bajo",
       value: stats.lowStockProducts,
       description: "Productos con menos de 10 unidades",
       icon: AlertCircle,
-      color: "bg-yellow-500"
+      color: "bg-yellow-500",
     },
     {
       title: "Productos Nuevos",
       value: stats.recentProducts,
       description: "Agregados esta semana",
       icon: TrendingUp,
-      color: "bg-purple-500"
-    }
+      color: "bg-purple-500",
+    },
   ];
 
   if (isLoading) {
@@ -124,7 +132,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar user={user || undefined} />
-      
+
       {/* Main content */}
       <div className="lg:pl-64">
         <div className="p-4 lg:p-8">
@@ -132,7 +140,8 @@ export default function AdminDashboard() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
             <p className="text-gray-600 mt-2">
-              Bienvenido de vuelta, {user?.name}. Aquí tienes un resumen de tu tienda.
+              Bienvenido de vuelta, {user?.name}. Aquí tienes un resumen de tu
+              tienda.
             </p>
           </div>
 
@@ -175,18 +184,20 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-3">
                   <a
-                    href="/admin/products/new"
+                    href="/admin/slides"
                     className="block w-full p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex items-center">
                       <Package className="mr-3 h-5 w-5 text-blue-500" />
                       <div>
-                        <div className="font-medium">Agregar Producto</div>
-                        <div className="text-sm text-gray-500">Crear un nuevo producto</div>
+                        <div className="font-medium">Gestionar Slides</div>
+                        <div className="text-sm text-gray-500">
+                          Gestiona los slides de la página principal
+                        </div>
                       </div>
                     </div>
                   </a>
-                  
+
                   <a
                     href="/admin/products"
                     className="block w-full p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -195,11 +206,13 @@ export default function AdminDashboard() {
                       <ShoppingCart className="mr-3 h-5 w-5 text-green-500" />
                       <div>
                         <div className="font-medium">Ver Productos</div>
-                        <div className="text-sm text-gray-500">Gestionar catálogo</div>
+                        <div className="text-sm text-gray-500">
+                          Gestionar catálogo
+                        </div>
                       </div>
                     </div>
                   </a>
-                  
+
                   <a
                     href="/admin/categories"
                     className="block w-full p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -208,7 +221,9 @@ export default function AdminDashboard() {
                       <Tags className="mr-3 h-5 w-5 text-purple-500" />
                       <div>
                         <div className="font-medium">Gestionar Categorías</div>
-                        <div className="text-sm text-gray-500">Organizar productos</div>
+                        <div className="text-sm text-gray-500">
+                          Organizar productos
+                        </div>
                       </div>
                     </div>
                   </a>
@@ -233,7 +248,9 @@ export default function AdminDashboard() {
                       <div className="flex items-center">
                         <AlertCircle className="mr-3 h-5 w-5 text-yellow-500" />
                         <div>
-                          <div className="font-medium text-yellow-800">Stock Bajo</div>
+                          <div className="font-medium text-yellow-800">
+                            Stock Bajo
+                          </div>
                           <div className="text-sm text-yellow-600">
                             {stats.lowStockProducts} productos con stock bajo
                           </div>
@@ -241,28 +258,32 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   )}
-                  
+
                   {stats.recentProducts > 0 && (
                     <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                       <div className="flex items-center">
                         <TrendingUp className="mr-3 h-5 w-5 text-green-500" />
                         <div>
-                          <div className="font-medium text-green-800">Productos Nuevos</div>
+                          <div className="font-medium text-green-800">
+                            Productos Nuevos
+                          </div>
                           <div className="text-sm text-green-600">
-                            {stats.recentProducts} productos agregados esta semana
+                            {stats.recentProducts} productos agregados esta
+                            semana
                           </div>
                         </div>
                       </div>
                     </div>
                   )}
-                  
-                  {stats.lowStockProducts === 0 && stats.recentProducts === 0 && (
-                    <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                      <div className="text-center text-gray-500">
-                        No hay alertas en este momento
+
+                  {stats.lowStockProducts === 0 &&
+                    stats.recentProducts === 0 && (
+                      <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                        <div className="text-center text-gray-500">
+                          No hay alertas en este momento
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </CardContent>
             </Card>
@@ -284,11 +305,17 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Rol:</span>
-                  <span className="ml-2 text-gray-900 capitalize">{user?.role}</span>
+                  <span className="ml-2 text-gray-900 capitalize">
+                    {user?.role}
+                  </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Última actualización:</span>
-                  <span className="ml-2 text-gray-900">{new Date().toLocaleDateString()}</span>
+                  <span className="font-medium text-gray-700">
+                    Última actualización:
+                  </span>
+                  <span className="ml-2 text-gray-900">
+                    {new Date().toLocaleDateString()}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -297,4 +324,4 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-} 
+}

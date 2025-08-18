@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authService } from "@/lib/api";
@@ -24,18 +30,18 @@ export default function AdminLogin() {
 
     try {
       const response = await authService.login(email, password);
-      
+
       if (response.success) {
         // Guardar token
-        localStorage.setItem('admin_token', response.data.token);
-        
+        localStorage.setItem("admin_token", response.data.token);
+
         // Redirigir al dashboard
-        router.push('/admin/dashboard');
+        router.push("/admin/dashboard");
       } else {
-        setError(response.message || 'Error al iniciar sesión');
+        setError(response.message || "Error al iniciar sesión");
       }
     } catch (error: any) {
-      setError(error.message || 'Error al conectar con el servidor');
+      setError(error.message || "Error al conectar con el servidor");
     } finally {
       setIsLoading(false);
     }
@@ -55,17 +61,22 @@ export default function AdminLogin() {
 
         <Card className="shadow-lg">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Iniciar Sesión</CardTitle>
+            <CardTitle className="text-2xl text-center">
+              Iniciar Sesión
+            </CardTitle>
             <CardDescription className="text-center">
               Ingresa tus credenciales para acceder al panel
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
               <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="email"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Email
                 </label>
                 <div className="relative">
@@ -85,7 +96,10 @@ export default function AdminLogin() {
 
               {/* Password */}
               <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Contraseña
                 </label>
                 <div className="relative">
@@ -143,18 +157,6 @@ export default function AdminLogin() {
             </form>
 
             {/* Demo credentials info */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="text-sm font-medium text-blue-800 mb-2">
-                Credenciales de prueba:
-              </h4>
-              <div className="text-xs text-blue-600 space-y-1">
-                <div><strong>Email:</strong> admin@lusoinsumos.com</div>
-                <div><strong>Contraseña:</strong> luso2025!</div>
-              </div>
-              <p className="text-xs text-blue-500 mt-2">
-                * Asegúrate de tener estos datos en tu base de datos
-              </p>
-            </div>
           </CardContent>
         </Card>
 
@@ -165,4 +167,4 @@ export default function AdminLogin() {
       </div>
     </div>
   );
-} 
+}

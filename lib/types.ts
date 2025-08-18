@@ -18,6 +18,7 @@ export interface Product {
   image_url: string | null;
   category_id: number;
   subcategory_id: number | null;
+  featured: number; // 0 = no destacado, 1 = destacado
   created_at: string;
   updated_at: string;
   // Relationship data (when available)
@@ -49,16 +50,20 @@ export interface Slide {
   image_url: string;
   link?: string | null;
   is_active: boolean;
+  show_title?: boolean;
+  show_subtitle?: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export interface SlideFormData {
   title: string;
-  subtitle?: string;
+  subtitle: string;
   image: File | null;
   link?: string;
   is_active: boolean;
+  show_title: boolean;
+  show_subtitle: boolean;
 }
 
 // Category types
@@ -87,6 +92,7 @@ export interface ProductFormData {
   stock: number;
   category_id: number;
   subcategory_id: number | null;
+  featured: boolean; // Campo para productos destacados
   image?: File | null; // Mantener para compatibilidad
   images?: File[]; // Array de archivos de imagen
 }
@@ -130,6 +136,8 @@ export interface HeaderSlide {
   title?: string | null;
   subtitle?: string | null;
   link?: string | null;
+  show_title?: boolean;
+  show_subtitle?: boolean;
 }
 
 export interface HomePageData {
