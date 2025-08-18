@@ -12,35 +12,41 @@ interface ProductCardProps {
   onAddToCart?: (product: ProductDisplay) => void;
 }
 
-export default function ProductCard({ product, onAddToCart }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  onAddToCart,
+}: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addItem, openCart } = useCart();
   const { addToast } = useToast();
-  
-  const hasDiscount = product.originalPrice && product.originalPrice > product.price;
-  const discountPercentage = hasDiscount 
-    ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
+
+  const hasDiscount =
+    product.originalPrice && product.originalPrice > product.price;
+  const discountPercentage = hasDiscount
+    ? Math.round(
+        ((product.originalPrice! - product.price) / product.originalPrice!) *
+          100
+      )
     : 0;
-    
+
   // Obtener todas las imágenes disponibles
-  const allImages = product.images && product.images.length > 0 
-    ? product.images 
-    : [product.image].filter(Boolean);
-    
+  const allImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image].filter(Boolean);
+
   const hasMultipleImages = allImages.length > 1;
-  
+
   const nextImage = () => {
     setCurrentImageIndex((prev) => {
       const next = (prev + 1) % allImages.length;
-      console.log(`Next image: ${prev} -> ${next}, total: ${allImages.length}`);
       return next;
     });
   };
-  
+
   const prevImage = () => {
     setCurrentImageIndex((prev) => {
       const next = (prev - 1 + allImages.length) % allImages.length;
-      console.log(`Prev image: ${prev} -> ${next}, total: ${allImages.length}`);
       return next;
     });
   };
@@ -51,9 +57,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
   }, [product.id]);
 
   // Debug: Log transform value
-  useEffect(() => {
-    console.log(`Transform: translateX(-${currentImageIndex * 100}%), Index: ${currentImageIndex}, Images: ${allImages.length}`);
-  }, [currentImageIndex, allImages.length]);
+  useEffect(() => {}, [currentImageIndex, allImages.length]);
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col w-full h-auto">
@@ -61,14 +65,14 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
         {allImages.length > 0 ? (
           <>
             {/* Container for sliding images */}
-            <div 
+            <div
               className="flex transition-transform duration-700 ease-out h-full w-full"
               style={{
-                transform: `translateX(-${currentImageIndex * 100}%)`
+                transform: `translateX(-${currentImageIndex * 100}%)`,
               }}
             >
               {allImages.map((imageUrl, index) => (
-                <div 
+                <div
                   key={index}
                   className="relative flex-shrink-0 w-full h-full"
                 >
@@ -83,7 +87,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
                 </div>
               ))}
             </div>
-            
+
             {/* Navigation arrows for multiple images */}
             {hasMultipleImages && (
               <>
@@ -107,7 +111,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
-                
+
                 {/* Image indicators */}
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-10">
                   {allImages.map((_, index) => (
@@ -119,7 +123,9 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
                         setCurrentImageIndex(index);
                       }}
                       className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-110 ${
-                        index === currentImageIndex ? 'bg-white scale-125' : 'bg-white/60 hover:bg-white/80'
+                        index === currentImageIndex
+                          ? "bg-white scale-125"
+                          : "bg-white/60 hover:bg-white/80"
                       }`}
                     />
                   ))}
@@ -130,7 +136,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
         ) : (
           <Package className="h-12 w-12 text-gray-400" />
         )}
-        
+
         {/* Stock Badge */}
         <div className="absolute top-3 right-3">
           {product.inStock ? (
@@ -165,20 +171,20 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
           </div>
         )}
       </div>
-      
+
       <div className="p-4 flex-1 flex flex-col">
         <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2 min-h-[2.5rem]">
           {product.name}
         </h3>
-        
+
         <p className="text-xs text-orange-600 mb-2 font-medium">
           {product.category}
         </p>
-        
+
         <p className="text-gray-600 text-xs mb-3 leading-relaxed line-clamp-2 flex-1">
-          {product.description || 'Sin descripción disponible'}
+          {product.description || "Sin descripción disponible"}
         </p>
-        
+
         <div className="flex items-center justify-between mb-3">
           <div className="flex flex-col">
             <span className="text-base font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
@@ -209,16 +215,16 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
                   category_id: 0,
                   subcategory_id: null,
                   featured: 0,
-                  created_at: '',
-                  updated_at: ''
+                  created_at: "",
+                  updated_at: "",
                 };
-                
+
                 addItem(productForCart);
                 addToast({
-                  type: 'success',
-                  title: 'Producto agregado',
+                  type: "success",
+                  title: "Producto agregado",
                   description: `${product.name} se agregó al carrito`,
-                  duration: 2000
+                  duration: 2000,
                 });
                 onAddToCart?.(product);
               }}

@@ -21,12 +21,6 @@ const convertProductToDisplay = (product: Product): ProductDisplay => {
       ? [getImageUrl(product.image_url)]
       : [];
 
-  console.log("🔄 Product processed:", {
-    name: product.name,
-    primaryImage,
-    allImages,
-  });
-
   return {
     id: product.id.toString(),
     name: product.name,
@@ -42,9 +36,7 @@ const convertProductToDisplay = (product: Product): ProductDisplay => {
 
 // Helper function to convert API Slide to legacy HeaderSlide format
 const convertSlideToHeaderSlide = (slide: Slide) => {
-  console.log("🎠 Converting slide to header slide:", slide);
   const imageUrl = getImageUrl(slide.image_url);
-  console.log("🎠 Processed slide image URL:", imageUrl);
 
   return {
     id: slide.id.toString(),
@@ -69,21 +61,16 @@ export default function Home() {
   useEffect(() => {
     const loadHomeData = async () => {
       try {
-        console.log("🏠 Loading home data...");
         const [slidesResponse, productsResponse] = await Promise.all([
           slideService.getActive(),
           productService.getFeatured(8),
         ]);
-
-        console.log("🏠 Slides response:", slidesResponse);
-        console.log("🏠 Products response:", productsResponse);
 
         let headerSlides = [];
         let featuredProducts = [];
 
         // Procesar slides
         if (slidesResponse.success && slidesResponse.data.slides) {
-          console.log("🏠 Processing slides:", slidesResponse.data.slides);
           headerSlides = slidesResponse.data.slides.map(
             convertSlideToHeaderSlide
           );
@@ -91,15 +78,10 @@ export default function Home() {
 
         // Procesar productos destacados
         if (productsResponse.success && productsResponse.data.products) {
-          console.log(
-            "🏠 Processing featured products:",
-            productsResponse.data.products
-          );
           featuredProducts = productsResponse.data.products.map(
             convertProductToDisplay
           );
         } else {
-          console.log("🏠 No featured products found or error in response");
         }
 
         setHomePageData({
@@ -107,7 +89,6 @@ export default function Home() {
           featuredProducts,
         });
       } catch (error) {
-        console.error("Error loading home data:", error);
         // Use fallback slide if API fails
         setHomePageData({
           headerSlides: [

@@ -92,34 +92,10 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         ...(subcategoria && { subcategory: subcategoria as string }),
       };
 
-      // Debug: Log parameters
-      console.log("=== FRONTEND DEBUG ===");
-      console.log("Raw URL params:", { categoria, subcategoria });
-      console.log("API call params:", params);
-      console.log("Current URL:", window.location.href);
-      console.log("====================");
-
       const response = await productService.getAll(params);
 
       if (response.success) {
         setProducts(response.data.products || []);
-        console.log(`=== RESPONSE DEBUG ===`);
-        console.log(
-          `Received ${(response.data.products || []).length} products`
-        );
-        console.log(
-          `Total items: ${response.data.pagination?.total_items || 0}`
-        );
-        console.log(
-          `Products:`,
-          response.data.products?.map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            category: p.category_name,
-            subcategory: p.subcategory_name,
-          }))
-        );
-        console.log(`=====================`);
 
         if (response.data.pagination) {
           setTotalPages(response.data.pagination.total_pages);
@@ -146,20 +122,20 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
   const handleAddToCart = (product: Product) => {
     if (product.stock <= 0) {
       addToast({
-        type: 'error',
-        title: 'Producto agotado',
-        description: 'Este producto no está disponible en este momento',
-        duration: 3000
+        type: "error",
+        title: "Producto agotado",
+        description: "Este producto no está disponible en este momento",
+        duration: 3000,
       });
       return;
     }
 
     addItem(product);
     addToast({
-      type: 'success',
-      title: 'Producto agregado',
+      type: "success",
+      title: "Producto agregado",
       description: `${product.name} se agregó al carrito`,
-      duration: 2000
+      duration: 2000,
     });
   };
 
