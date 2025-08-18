@@ -3,7 +3,6 @@
 import { useCart } from "@/lib/cart-context";
 import { getImageUrl } from "@/lib/api";
 import { X, Minus, Plus, ShoppingCart, MessageCircle, Trash2 } from "lucide-react";
-import { Sheet } from "@/components/ui/sheet";
 import Link from "next/link";
 
 export function CartSidebar() {

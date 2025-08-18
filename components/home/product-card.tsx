@@ -17,7 +17,7 @@ export default function ProductCard({
   onAddToCart,
 }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { addItem, openCart } = useCart();
+  const { addItem } = useCart();
   const { addToast } = useToast();
 
   const hasDiscount =

@@ -16,7 +16,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -38,13 +38,13 @@ export default function AdminLayout({
 
       try {
         const response = await authService.getMe();
-        if (response.success) {
-          setUser(response.data.user);
+        if (response.success && response.data) {
+          setUser((response.data as { user: User }).user);
         } else {
           localStorage.removeItem('admin_token');
           router.push('/admin/login');
         }
-      } catch (error) {
+      } catch (_) {
         localStorage.removeItem('admin_token');
         router.push('/admin/login');
       } finally {

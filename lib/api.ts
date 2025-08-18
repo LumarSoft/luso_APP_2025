@@ -2,7 +2,7 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3006/api";
 
 // Tipos para las respuestas de la API
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;
@@ -14,7 +14,7 @@ interface ApiError {
 }
 
 // Función helper para hacer requests
-async function apiRequest<T = any>(
+async function apiRequest<T = ApiResponse>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
@@ -59,7 +59,7 @@ async function apiRequest<T = any>(
 }
 
 // Función helper para requests con FormData (para uploads)
-async function apiFormRequest<T = any>(
+async function apiFormRequest<T = ApiResponse>(
   endpoint: string,
   formData: FormData,
   method: string = "POST"

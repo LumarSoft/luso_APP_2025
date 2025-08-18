@@ -78,8 +78,8 @@ export default function UsersPage() {
   const loadCurrentUser = async () => {
     try {
       const response = await authService.getMe();
-      if (response.success) {
-        setCurrentUser(response.data.user);
+              if (response.success && response.data) {
+          setCurrentUser((response.data as { user: User }).user);
       }
     } catch (error) {
       console.error("Error loading current user:", error);
@@ -91,10 +91,13 @@ export default function UsersPage() {
     try {
       setLoading(true);
       const response = await userService.getUsers();
-      setUsers(response.data.users);
-    } catch (error: any) {
-      console.error("Error al cargar usuarios:", error);
-      toast.error(error.response?.data?.message || "Error al cargar usuarios");
+      if (response.success && response.data) {
+        setUsers((response.data as { users: User[] }).users);
+      }
+    } catch (error: unknown) {
+      const err = error as Error & { response?: { data?: { message?: string } } };
+      console.error("Error al cargar usuarios:", err);
+      toast.error(err.response?.data?.message || "Error al cargar usuarios");
     } finally {
       setLoading(false);
     }

@@ -8,7 +8,6 @@ import {
   AlertCircle,
   Cpu,
   Monitor,
-  Smartphone,
   Wifi,
 } from "lucide-react";
 

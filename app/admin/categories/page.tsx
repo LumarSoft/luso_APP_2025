@@ -63,19 +63,21 @@ export default function CategoriesPage() {
         categoryService.getAll()
       ]);
 
-      if (userResponse.success) {
-        setUser(userResponse.data.user);
+      if (userResponse.success && userResponse.data) {
+        setUser((userResponse.data as { user: User }).user);
       }
 
-      if (categoriesResponse.success) {
-        const categoriesData = categoriesResponse.data.categories;
+      if (categoriesResponse.success && categoriesResponse.data) {
+        const categoriesData = (categoriesResponse.data as { categories: Category[] }).categories;
         
         // Load subcategories for each category
         const categoriesWithSubcategories = await Promise.all(
           categoriesData.map(async (category: Category) => {
             try {
               const subcategoriesResponse = await categoryService.getSubcategories(category.id.toString());
-              const subcategories = subcategoriesResponse.success ? subcategoriesResponse.data.subcategories : [];
+              const subcategories = subcategoriesResponse.success && subcategoriesResponse.data 
+                ? (subcategoriesResponse.data as { subcategories: Subcategory[] }).subcategories 
+                : [];
               
               return {
                 ...category,
@@ -153,19 +155,20 @@ export default function CategoriesPage() {
         loadInitialData();
         setDeletingCategory(null);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as Error & { isBusinessError?: boolean; message?: string };
       console.error('Error deleting category:', error);
       
       // Distinguir entre errores de negocio y errores técnicos
-      if (error.isBusinessError) {
+      if (err.isBusinessError) {
         // Error de negocio (400) - mostrar como advertencia
         toast.warning(`No se puede eliminar la categoría "${category.name}"`, {
-          description: error.message || 'La categoría tiene productos asociados'
+          description: err.message || 'La categoría tiene productos asociados'
         });
       } else {
         // Error técnico (500, etc.) - mostrar como error
         toast.error(`Error al eliminar la categoría "${category.name}"`, {
-          description: error.message || 'Error interno del servidor. Inténtalo de nuevo o contacta al administrador'
+          description: err.message || 'Error interno del servidor. Inténtalo de nuevo o contacta al administrador'
         });
       }
     }
@@ -186,19 +189,20 @@ export default function CategoriesPage() {
         loadInitialData();
         setDeletingSubcategory(null);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as Error & { isBusinessError?: boolean; message?: string };
       console.error('Error deleting subcategory:', error);
       
       // Distinguir entre errores de negocio y errores técnicos
-      if (error.isBusinessError) {
+      if (err.isBusinessError) {
         // Error de negocio (400) - mostrar como advertencia
         toast.warning(`No se puede eliminar la subcategoría "${subcategory.name}"`, {
-          description: error.message || 'La subcategoría tiene productos asociados'
+          description: err.message || 'La subcategoría tiene productos asociados'
         });
       } else {
         // Error técnico (500, etc.) - mostrar como error
         toast.error(`Error al eliminar la subcategoría "${subcategory.name}"`, {
-          description: error.message || 'Error interno del servidor. Inténtalo de nuevo o contacta al administrador'
+          description: err.message || 'Error interno del servidor. Inténtalo de nuevo o contacta al administrador'
         });
       }
     }
@@ -550,7 +554,7 @@ export default function CategoriesPage() {
                   Confirmar Eliminación
                 </DialogTitle>
                 <DialogDescription>
-                  ¿Estás seguro de que deseas eliminar la categoría "{deletingCategory?.name}"?
+                  ¿Estás seguro de que deseas eliminar la categoría &quot;{deletingCategory?.name}&quot;?
                   {deletingCategory && categories.find(c => c.id === deletingCategory.id)?.subcategoryCount! > 0 && (
                     <span className="block mt-2 text-orange-600 font-medium">
                       Esta categoría tiene subcategorías asociadas que también serán eliminadas.
@@ -582,7 +586,7 @@ export default function CategoriesPage() {
                   Confirmar Eliminación
                 </DialogTitle>
                 <DialogDescription>
-                  ¿Estás seguro de que deseas eliminar la subcategoría "{deletingSubcategory?.name}"?
+                  ¿Estás seguro de que deseas eliminar la subcategoría &quot;{deletingSubcategory?.name}&quot;?
                   Esta acción no se puede deshacer.
                 </DialogDescription>
               </DialogHeader>

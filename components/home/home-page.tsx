@@ -10,7 +10,7 @@ interface HomePageProps {
 }
 
 export function HomePage({ data }: HomePageProps) {
-  const [cartItems, setCartItems] = useState<string[]>([]);
+  const [, setCartItems] = useState<string[]>([]);
 
   const handleAddToCart = (productId: string) => {
     setCartItems((prev) => [...prev, productId]);

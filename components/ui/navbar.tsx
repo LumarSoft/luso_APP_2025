@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, Menu, X, ShoppingBag, Search } from "lucide-react";
+import { ChevronDown, Menu, X, Search } from "lucide-react";
 import { categoryService } from "@/lib/api";
 import { Category, Subcategory } from "@/lib/types";
 import { SearchModal } from "./search-modal";
@@ -44,19 +44,19 @@ export function Navbar() {
       setIsLoading(true);
       const response = await categoryService.getAll();
 
-      if (response.success) {
+      if (response.success && response.data) {
         // Para cada categoría, obtener sus subcategorías
         const categoriesWithSubs = await Promise.all(
-          response.data.categories.map(async (category: Category) => {
+          (response.data as { categories: Category[] }).categories.map(async (category: Category) => {
             try {
               const subcategoriesResponse =
                 await categoryService.getSubcategories(category.id.toString());
-              return {
-                ...category,
-                subcategories: subcategoriesResponse.success
-                  ? subcategoriesResponse.data.subcategories
-                  : [],
-              };
+                              return {
+                  ...category,
+                  subcategories: subcategoriesResponse.success && subcategoriesResponse.data
+                    ? (subcategoriesResponse.data as { subcategories: Subcategory[] }).subcategories 
+                    : [],
+                };
             } catch (error) {
               console.error(
                 `Error loading subcategories for category ${category.id}:`,

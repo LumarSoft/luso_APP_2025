@@ -10,13 +10,12 @@ import {
 } from "@/components/ui/card";
 import { Sidebar } from "@/components/admin/sidebar";
 import { authService, productService, categoryService } from "@/lib/api";
+import { Product, Category } from "@/lib/types";
 import {
   Package,
   Tags,
   ShoppingCart,
   TrendingUp,
-  Users,
-  DollarSign,
   AlertCircle,
   Activity,
 } from "lucide-react";
@@ -50,23 +49,23 @@ export default function AdminDashboard() {
       try {
         // Cargar datos del usuario
         const userResponse = await authService.getMe();
-        if (userResponse.success) {
-          setUser(userResponse.data.user);
+        if (userResponse.success && userResponse.data) {
+          setUser((userResponse.data as { user: User }).user);
         }
 
         // Cargar productos
         const productsResponse = await productService.getAll({ limit: 1000 });
         const categoriesResponse = await categoryService.getAll();
 
-        if (productsResponse.success && categoriesResponse.success) {
-          const products = productsResponse.data.products;
-          const categories = categoriesResponse.data.categories;
+        if (productsResponse.success && categoriesResponse.success && productsResponse.data && categoriesResponse.data) {
+          const products = (productsResponse.data as { products: Product[] }).products;
+          const categories = (categoriesResponse.data as { categories: Category[] }).categories;
 
           // Calcular estadísticas
           const lowStock = products.filter(
-            (product: any) => product.stock < 10
+            (product: Product) => product.stock < 10
           ).length;
-          const recent = products.filter((product: any) => {
+          const recent = products.filter((product: Product) => {
             const createdAt = new Date(product.created_at);
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);

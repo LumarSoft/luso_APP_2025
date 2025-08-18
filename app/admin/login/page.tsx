@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -31,17 +30,18 @@ export default function AdminLogin() {
     try {
       const response = await authService.login(email, password);
 
-      if (response.success) {
+      if (response.success && response.data) {
         // Guardar token
-        localStorage.setItem("admin_token", response.data.token);
+        localStorage.setItem("admin_token", (response.data as { token: string }).token);
 
         // Redirigir al dashboard
         router.push("/admin/dashboard");
       } else {
         setError(response.message || "Error al iniciar sesión");
       }
-    } catch (error: any) {
-      setError(error.message || "Error al conectar con el servidor");
+    } catch (error: unknown) {
+      const err = error as Error;
+      setError(err.message || "Error al conectar con el servidor");
     } finally {
       setIsLoading(false);
     }
