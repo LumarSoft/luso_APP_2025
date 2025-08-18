@@ -150,67 +150,125 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
             <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-red-600 mx-auto rounded-full"></div>
           </div>
 
+          {/* SECCIÓN MEJORADA DE CATEGORÍAS Y SUBCATEGORÍAS */}
           {(categoria || search) && (
-            <div className="mb-8 text-center">
-              <div className="inline-block bg-gradient-to-r from-orange-100 to-red-100 px-6 py-3 rounded-full border border-orange-200">
-                <p className="text-lg font-medium text-gray-700">
-                  {search ? (
-                    <>
-                      <span className="text-orange-600 font-semibold">
-                        Búsqueda:
-                      </span>{" "}
-                      {search}
-                      {categoria && (
+            <div className="mb-8">
+              {/* Vista Desktop - mantener el diseño original */}
+              <div className="hidden md:block text-center">
+                <div className="inline-block bg-gradient-to-r from-orange-100 to-red-100 px-6 py-3 rounded-full border border-orange-200">
+                  <p className="text-lg font-medium text-gray-700">
+                    {search ? (
+                      <>
+                        <span className="text-orange-600 font-semibold">
+                          Búsqueda:
+                        </span>{" "}
+                        {search}
+                        {categoria && (
+                          <>
+                            <span className="mx-2 text-orange-400">•</span>
+                            <span className="text-red-600 font-semibold">
+                              en:
+                            </span>
+                            {isLoadingCategoryNames ? (
+                              <span className="inline-block w-16 h-4 bg-gray-200 rounded animate-pulse ml-1">
+                                {" "}
+                              </span>
+                            ) : (
+                              categoryName || categoria
+                            )}
+                          </>
+                        )}
+                      </>
+                    ) : categoria ? (
+                      subcategoria ? (
                         <>
-                          <span className="mx-2 text-orange-400">•</span>
-                          <span className="text-red-600 font-semibold">
-                            en:
+                          <span className="text-orange-600 font-semibold">
+                            Categoría:
                           </span>
                           {isLoadingCategoryNames ? (
-                            <span className="inline-block w-16 h-4 bg-gray-200 rounded animate-pulse ml-1">
-                              {" "}
-                            </span>
+                            <span className="inline-block w-20 h-4 bg-gray-200 rounded animate-pulse ml-1"></span>
+                          ) : (
+                            categoryName || categoria
+                          )}
+                          <span className="mx-2 text-orange-400">•</span>
+                          <span className="text-red-600 font-semibold">
+                            Subcategoría:
+                          </span>
+                          {isLoadingCategoryNames ? (
+                            <span className="inline-block w-16 h-4 bg-gray-200 rounded animate-pulse ml-1"></span>
+                          ) : (
+                            subcategoryName || subcategoria
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-orange-600 font-semibold">
+                            Categoría:
+                          </span>
+                          {isLoadingCategoryNames ? (
+                            <span className="inline-block w-20 h-4 bg-gray-200 rounded animate-pulse ml-1"></span>
                           ) : (
                             categoryName || categoria
                           )}
                         </>
-                      )}
-                    </>
-                  ) : categoria ? (
-                    subcategoria ? (
-                      <>
-                        <span className="text-orange-600 font-semibold">
-                          Categoría:
-                        </span>
-                        {isLoadingCategoryNames ? (
-                          <span className="inline-block w-20 h-4 bg-gray-200 rounded animate-pulse ml-1"></span>
-                        ) : (
-                          categoryName || categoria
-                        )}
-                        <span className="mx-2 text-orange-400">•</span>
-                        <span className="text-red-600 font-semibold">
-                          Subcategoría:
-                        </span>
-                        {isLoadingCategoryNames ? (
-                          <span className="inline-block w-16 h-4 bg-gray-200 rounded animate-pulse ml-1"></span>
-                        ) : (
-                          subcategoryName || subcategoria
-                        )}
-                      </>
+                      )
+                    ) : null}
+                  </p>
+                </div>
+              </div>
+
+              {/* Vista Mobile - diseño mejorado */}
+              <div className="block md:hidden space-y-3">
+                {/* Búsqueda en mobile */}
+                {search && (
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm font-semibold text-blue-700 uppercase tracking-wide">
+                        Búsqueda
+                      </span>
+                    </div>
+                    <p className="text-lg font-bold text-gray-800">{search}</p>
+                  </div>
+                )}
+
+                {/* Categoría en mobile */}
+                {categoria && (
+                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      <span className="text-sm font-semibold text-orange-700 uppercase tracking-wide">
+                        Categoría
+                      </span>
+                    </div>
+                    {isLoadingCategoryNames ? (
+                      <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
                     ) : (
-                      <>
-                        <span className="text-orange-600 font-semibold">
-                          Categoría:
-                        </span>
-                        {isLoadingCategoryNames ? (
-                          <span className="inline-block w-20 h-4 bg-gray-200 rounded animate-pulse ml-1"></span>
-                        ) : (
-                          categoryName || categoria
-                        )}
-                      </>
-                    )
-                  ) : null}
-                </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {categoryName || categoria}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Subcategoría en mobile */}
+                {subcategoria && (
+                  <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      <span className="text-sm font-semibold text-red-700 uppercase tracking-wide">
+                        Subcategoría
+                      </span>
+                    </div>
+                    {isLoadingCategoryNames ? (
+                      <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
+                    ) : (
+                      <p className="text-lg font-bold text-gray-800">
+                        {subcategoryName || subcategoria}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}

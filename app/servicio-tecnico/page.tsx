@@ -497,7 +497,7 @@ Solicitud generada desde LusoInsumos`;
                 Respuesta Rápida
               </h3>
               <p className="text-gray-600 text-sm">
-                Te contactamos en menos de 30 minutos durante horario laboral
+                Te contactamos lo antes posible durante horario laboral.
               </p>
             </div>
 
@@ -519,7 +519,7 @@ Solicitud generada desde LusoInsumos`;
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Garantía</h3>
               <p className="text-gray-600 text-sm">
-                Todos nuestros servicios incluyen garantía de satisfacción
+                Todos nuestros servicios incluyen garantía.
               </p>
             </div>
           </div>

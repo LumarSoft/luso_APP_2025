@@ -34,19 +34,19 @@ export default function CartPage() {
             </div>
 
             {/* Empty State */}
-            <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
-              <div className="bg-gray-100 p-12 rounded-full mb-6 inline-block">
-                <ShoppingCart className="h-16 w-16 text-gray-400" />
+            <div className="bg-white rounded-2xl shadow-sm p-8 sm:p-12 text-center">
+              <div className="bg-gray-100 p-8 sm:p-12 rounded-full mb-4 sm:mb-6 inline-block">
+                <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Tu carrito está vacío</h2>
-              <p className="text-gray-600 mb-8 text-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Tu carrito está vacío</h2>
+              <p className="text-gray-600 mb-6 sm:mb-8 text-base sm:text-lg">
                 Parece que aún no has agregado productos a tu carrito
               </p>
               <Link
                 href="/productos"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl font-semibold hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl font-semibold hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base"
               >
-                <ShoppingCart className="h-5 w-5" />
+                <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
                 Explorar productos
               </Link>
             </div>
@@ -61,16 +61,16 @@ export default function CartPage() {
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
+          <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
             <button
               onClick={() => router.back()}
               className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <ArrowLeft className="h-6 w-6" />
+              <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Mi Carrito</h1>
-              <p className="text-gray-600">{state.totalItems} {state.totalItems === 1 ? 'producto' : 'productos'}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mi Carrito</h1>
+              <p className="text-sm sm:text-base text-gray-600">{state.totalItems} {state.totalItems === 1 ? 'producto' : 'productos'}</p>
             </div>
           </div>
 
@@ -78,10 +78,10 @@ export default function CartPage() {
             {/* Products List */}
             <div className="lg:col-span-2 space-y-4">
               {state.items.map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
-                  <div className="flex gap-6">
+                <div key={item.id} className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow">
+                  <div className="flex gap-4 sm:gap-6">
                     {/* Product Image */}
-                    <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
                       {item.image_url ? (
                         <img
                           src={getImageUrl(item.image_url)}
@@ -95,7 +95,7 @@ export default function CartPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <ShoppingCart className="h-8 w-8 text-gray-400" />
+                          <ShoppingCart className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
                         </div>
                       )}
                     </div>
@@ -103,10 +103,10 @@ export default function CartPage() {
                     {/* Product Details */}
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="font-semibold text-gray-900 text-lg">{item.name}</h3>
+                        <div className="flex-1 min-w-0 pr-2">
+                          <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight">{item.name}</h3>
                           {item.category_name && (
-                            <p className="text-sm text-orange-600 mt-1">
+                            <p className="text-xs sm:text-sm text-orange-600 mt-1">
                               {item.category_name}
                               {item.subcategory_name && ` • ${item.subcategory_name}`}
                             </p>
@@ -114,14 +114,54 @@ export default function CartPage() {
                         </div>
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-full transition-colors"
+                          className="text-red-500 hover:text-red-700 p-2 sm:p-3 hover:bg-red-50 rounded-full transition-colors flex-shrink-0"
                           title="Eliminar producto"
                         >
-                          <Trash2 className="h-5 w-5" />
+                          <Trash2 className="h-5 w-5 sm:h-6 sm:w-6" />
                         </button>
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      {/* Mobile Layout - Stacked */}
+                      <div className="block sm:hidden space-y-3">
+                        {/* Quantity Controls */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                              className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border-2 border-gray-300 rounded-full hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </button>
+                            <span className="w-12 sm:w-16 text-center font-semibold text-base sm:text-lg">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              disabled={item.quantity >= item.stock}
+                              className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border-2 border-gray-300 rounded-full hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {/* Stock and Price - Mobile */}
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs sm:text-sm text-gray-500">
+                            Stock: {item.stock}
+                          </div>
+                          <div className="text-right">
+                            <div className="text-base sm:text-lg font-bold text-gray-900">
+                              ${(item.price * item.quantity).toFixed(2)}
+                            </div>
+                            <div className="text-xs sm:text-sm text-gray-500">
+                              ${item.price.toFixed(2)} c/u
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Desktop Layout - Side by Side */}
+                      <div className="hidden sm:flex items-center justify-between">
                         {/* Quantity Controls */}
                         <div className="flex items-center gap-4">
                           <div className="flex items-center gap-3">
@@ -164,51 +204,51 @@ export default function CartPage() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Resumen del pedido</h2>
+              <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 sticky top-8">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Resumen del pedido</h2>
                 
                 {/* Items Summary */}
-                <div className="space-y-3 mb-6">
+                <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                   {state.items.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <span className="text-gray-600">
+                    <div key={item.id} className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-gray-600 flex-1 pr-2">
                         {item.name} × {item.quantity}
                       </span>
-                      <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="font-medium text-right flex-shrink-0">${(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Total */}
-                <div className="border-t border-gray-200 pt-4 mb-6">
+                <div className="border-t border-gray-200 pt-3 sm:pt-4 mb-4 sm:mb-6">
                   <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold text-gray-900">Total:</span>
-                    <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                    <span className="text-lg sm:text-xl font-bold text-gray-900">Total:</span>
+                    <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                       ${state.totalAmount.toFixed(2)}
                     </span>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <button
                     onClick={handleWhatsAppOrder}
-                    className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-3"
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 sm:py-4 rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base"
                   >
-                    <MessageCircle className="h-5 w-5" />
+                    <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                     Realizar pedido por WhatsApp
                   </button>
                   
                   <Link
                     href="/productos"
-                    className="w-full block text-center bg-white border-2 border-orange-600 text-orange-600 py-3 rounded-xl font-semibold hover:bg-orange-50 transition-all duration-200"
+                    className="w-full block text-center bg-white border-2 border-orange-600 text-orange-600 py-3 rounded-xl font-semibold hover:bg-orange-50 transition-all duration-200 text-sm sm:text-base"
                   >
                     Seguir comprando
                   </Link>
                   
                   <button
                     onClick={clearCart}
-                    className="w-full text-gray-600 hover:text-red-600 py-3 text-sm font-medium transition-colors hover:bg-red-50 rounded-xl"
+                    className="w-full text-gray-600 hover:text-red-600 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors hover:bg-red-50 rounded-xl"
                   >
                     Vaciar carrito
                   </button>

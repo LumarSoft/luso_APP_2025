@@ -9,7 +9,7 @@ export function CartButton() {
   return (
     <button
       onClick={toggleCart}
-      className="fixed bottom-6 right-6 bg-gradient-to-r from-orange-600 to-red-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl hover:from-orange-700 hover:to-red-700 transition-all duration-200 z-30 transform hover:-translate-y-1 hover:scale-110"
+      className="fixed bottom-6 right-6 bg-gradient-to-r from-orange-600 to-red-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl hover:from-orange-700 hover:to-red-700 transition-all duration-200 z-30 transform hover:-translate-y-1 hover:scale-110 cursor-pointer"
     >
       <div className="relative">
         <ShoppingCart className="h-6 w-6" />

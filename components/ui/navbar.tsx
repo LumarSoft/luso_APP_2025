@@ -47,24 +47,33 @@ export function Navbar() {
       if (response.success && response.data) {
         // Para cada categoría, obtener sus subcategorías
         const categoriesWithSubs = await Promise.all(
-          (response.data as { categories: Category[] }).categories.map(async (category: Category) => {
-            try {
-              const subcategoriesResponse =
-                await categoryService.getSubcategories(category.id.toString());
-                              return {
+          (response.data as { categories: Category[] }).categories.map(
+            async (category: Category) => {
+              try {
+                const subcategoriesResponse =
+                  await categoryService.getSubcategories(
+                    category.id.toString()
+                  );
+                return {
                   ...category,
-                  subcategories: subcategoriesResponse.success && subcategoriesResponse.data
-                    ? (subcategoriesResponse.data as { subcategories: Subcategory[] }).subcategories 
-                    : [],
+                  subcategories:
+                    subcategoriesResponse.success && subcategoriesResponse.data
+                      ? (
+                          subcategoriesResponse.data as {
+                            subcategories: Subcategory[];
+                          }
+                        ).subcategories
+                      : [],
                 };
-            } catch (error) {
-              console.error(
-                `Error loading subcategories for category ${category.id}:`,
-                error
-              );
-              return { ...category, subcategories: [] };
+              } catch (error) {
+                console.error(
+                  `Error loading subcategories for category ${category.id}:`,
+                  error
+                );
+                return { ...category, subcategories: [] };
+              }
             }
-          })
+          )
         );
 
         setCategories(categoriesWithSubs);
@@ -91,7 +100,7 @@ export function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center group">
-              <div className="relative h-10 w-40 sm:h-38 sm:w-48 transition-all duration-200 group-hover:scale-105">
+              <div className="relative h-26 w-32 sm:h-38 sm:w-48 transition-all duration-200 group-hover:scale-105">
                 <Image
                   src="/98b87bc8-8177-445e-b283-da11fce10e6e.png"
                   alt="LusoInsumos - Redes y Soporte IT"
@@ -298,7 +307,7 @@ export function Navbar() {
 
               <Link
                 href="/servicio-tecnico"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-orange-600 hover:bg-white transition-colors duration-200"
+                className="block mx-3 my-2 text-center text-white bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Servicio Técnico

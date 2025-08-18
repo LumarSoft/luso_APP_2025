@@ -90,7 +90,7 @@ export function Footer() {
             <h3 className="text-xl font-bold text-red-600">LusoInsumos</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
               Tu aliado confiable en productos de calidad para el hogar y
-              negocio. Más de 10 años de experiencia en el mercado.
+              negocio. Más de 5 años de experiencia en el mercado.
             </p>
             <div className="flex space-x-4">
               <a
@@ -194,29 +194,8 @@ export function Footer() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} LusoInsumos. Todos los derechos
-              reservados.
+              © {new Date().getFullYear()} LusoInsumos
             </div>
-            <nav className="flex space-x-6 text-sm">
-              <a
-                href="/politica-privacidad"
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                Política de Privacidad
-              </a>
-              <a
-                href="/terminos-condiciones"
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                Términos y Condiciones
-              </a>
-              <a
-                href="/sitemap.xml"
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                Mapa del Sitio
-              </a>
-            </nav>
           </div>
         </div>
       </div>
