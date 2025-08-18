@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         port: '3006',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'flyspirits.online',
+        port: '',
+        pathname: '/uploads/**',
+      },
     ],
   },
 };
