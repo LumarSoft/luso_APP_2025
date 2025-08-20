@@ -24,7 +24,7 @@ export function HomePage({ data }: HomePageProps) {
 
       <div className="relative z-10">
         {/* Header Hero Section */}
-        <section className="container mx-auto px-4 py-8">
+        <section className="container mx-auto px-0 py-0 sm:px-4 sm:py-8">
           <HeroHeader slides={data.headerSlides} />
         </section>
 

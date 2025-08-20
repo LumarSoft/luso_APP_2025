@@ -48,6 +48,7 @@ export interface Slide {
   title?: string | null;
   subtitle?: string | null;
   image_url: string;
+  image_url_mobile?: string | null;
   link?: string | null;
   is_active: boolean;
   show_title?: boolean;
@@ -60,6 +61,7 @@ export interface SlideFormData {
   title: string;
   subtitle: string;
   image: File | null;
+  mobile_image: File | null;
   link?: string;
   is_active: boolean;
   show_title: boolean;
@@ -133,6 +135,7 @@ export interface User {
 export interface HeaderSlide {
   id: string;
   image: string;
+  image_url_mobile?: string | null;
   title?: string | null;
   subtitle?: string | null;
   link?: string | null;

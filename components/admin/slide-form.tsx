@@ -33,6 +33,7 @@ export default function SlideForm({
     title: "",
     subtitle: "",
     image: null,
+    mobile_image: null,
     link: "",
     is_active: true,
     show_title: true,
@@ -40,10 +41,17 @@ export default function SlideForm({
   });
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewMobileImage, setPreviewMobileImage] = useState<string | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isMobileDragOver, setIsMobileDragOver] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [removeDesktopImage, setRemoveDesktopImage] = useState(false);
+  const [removeMobileImageFlag, setRemoveMobileImageFlag] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mobileFileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize form data when slide changes
   useEffect(() => {
@@ -52,24 +60,35 @@ export default function SlideForm({
         title: slide.title ?? "",
         subtitle: slide.subtitle ?? "",
         image: null,
+        mobile_image: null,
         link: slide.link ?? "",
         is_active: slide.is_active,
         show_title: slide.show_title !== undefined ? !!slide.show_title : true,
-        show_subtitle: slide.show_subtitle !== undefined ? !!slide.show_subtitle : true,
+        show_subtitle:
+          slide.show_subtitle !== undefined ? !!slide.show_subtitle : true,
       });
       setPreviewImage(slide.image_url ? getImageUrl(slide.image_url) : null);
+      setPreviewMobileImage(
+        slide.image_url_mobile ? getImageUrl(slide.image_url_mobile) : null
+      );
+      setRemoveDesktopImage(false);
+      setRemoveMobileImageFlag(false);
     } else {
       // Reset form for new slide
       setFormData({
         title: "",
         subtitle: "",
         image: null,
+        mobile_image: null,
         link: "",
         is_active: true,
         show_title: true,
         show_subtitle: true,
       });
       setPreviewImage(null);
+      setPreviewMobileImage(null);
+      setRemoveDesktopImage(false);
+      setRemoveMobileImageFlag(false);
     }
     setErrors({});
   }, [slide]);
@@ -83,7 +102,7 @@ export default function SlideForm({
     }
   };
 
-  const validateAndProcessFile = (file: File) => {
+  const validateAndProcessFile = (file: File, isMobile: boolean = false) => {
     // Validate file type
     if (!file.type.startsWith("image/")) {
       toast.error("Por favor selecciona un archivo de imagen válido");
@@ -96,14 +115,26 @@ export default function SlideForm({
       return false;
     }
 
-    setFormData((prev) => ({ ...prev, image: file }));
+    if (isMobile) {
+      setFormData((prev) => ({ ...prev, mobile_image: file }));
+      setRemoveMobileImageFlag(false);
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewMobileImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setFormData((prev) => ({ ...prev, image: file }));
+      setRemoveDesktopImage(false);
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreviewImage(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
     return true;
   };
 
@@ -111,6 +142,15 @@ export default function SlideForm({
     const file = event.target.files?.[0];
     if (file) {
       validateAndProcessFile(file);
+    }
+  };
+
+  const handleMobileImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      validateAndProcessFile(file, true);
     }
   };
 
@@ -138,22 +178,58 @@ export default function SlideForm({
     }
   };
 
+  const handleMobileDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMobileDragOver(true);
+  };
+
+  const handleMobileDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMobileDragOver(false);
+  };
+
+  const handleMobileDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMobileDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      const file = files[0];
+      validateAndProcessFile(file, true);
+    }
+  };
+
   const removeImage = () => {
     setFormData((prev) => ({ ...prev, image: null }));
-    setPreviewImage(slide?.image_url ? getImageUrl(slide.image_url) : null);
+    setPreviewImage(null);
+    setRemoveDesktopImage(true);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
+  const removeMobileImage = () => {
+    setFormData((prev) => ({ ...prev, mobile_image: null }));
+    setPreviewMobileImage(null);
+    setRemoveMobileImageFlag(true);
+    if (mobileFileInputRef.current) {
+      mobileFileInputRef.current.value = "";
+    }
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
-    // Título es opcional, solo validar longitud si se proporciona
-    if (formData.title && formData.title.length > 255) {
+
+    // Título es obligatorio
+    if (!formData.title || formData.title.trim().length === 0) {
+      newErrors.title = "El título es obligatorio";
+    } else if (formData.title.trim().length > 255) {
       newErrors.title = "El título no puede exceder 255 caracteres";
     }
-    
+
     // Subtítulo es opcional, solo validar longitud si se proporciona
     if (formData.subtitle && formData.subtitle.length > 1000) {
       newErrors.subtitle = "El subtítulo no puede exceder 1000 caracteres";
@@ -169,6 +245,11 @@ export default function SlideForm({
 
     if (!slide && !formData.image) {
       newErrors.image = "La imagen es requerida para un nuevo slide";
+    }
+    
+    // Para slides existentes, verificar que no se elimine la imagen desktop sin subir una nueva
+    if (slide && removeDesktopImage && !formData.image) {
+      newErrors.image = "No puedes eliminar la imagen desktop sin subir una nueva";
     }
 
     setErrors(newErrors);
@@ -191,11 +272,18 @@ export default function SlideForm({
       apiFormData.append("title", formData.title.trim());
       apiFormData.append("subtitle", formData.subtitle?.trim() || "");
       apiFormData.append("link", formData.link?.trim() || "");
-  apiFormData.append("is_active", formData.is_active ? "true" : "false");
+      apiFormData.append("is_active", formData.is_active ? "true" : "false");
       apiFormData.append("show_title", formData.show_title ? "1" : "0");
       apiFormData.append("show_subtitle", formData.show_subtitle ? "1" : "0");
       if (formData.image) {
         apiFormData.append("image", formData.image);
+      }
+      if (formData.mobile_image) {
+        apiFormData.append("mobile_image", formData.mobile_image);
+      }
+      // Si se está editando y se removió la imagen mobile, enviar flag
+      if (slide && removeMobileImageFlag) {
+        apiFormData.append("remove_mobile_image", "true");
       }
 
       let response;
@@ -226,13 +314,14 @@ export default function SlideForm({
       {/* Basic Information */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="title">Título del Slide (opcional)</Label>
+          <Label htmlFor="title">Título del Slide *</Label>
           <Input
             id="title"
             value={formData.title}
             onChange={(e) => handleInputChange("title", e.target.value)}
-            placeholder="Ingresa el título del slide (opcional)"
+            placeholder="Ingresa el título del slide"
             className={errors.title ? "border-red-500" : ""}
+            required
           />
           {errors.title && (
             <p className="text-sm text-red-500">{errors.title}</p>
@@ -306,7 +395,9 @@ export default function SlideForm({
             id="show_subtitle"
             type="checkbox"
             checked={formData.show_subtitle}
-            onChange={(e) => handleInputChange("show_subtitle", e.target.checked)}
+            onChange={(e) =>
+              handleInputChange("show_subtitle", e.target.checked)
+            }
             className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
           />
           <Label htmlFor="show_subtitle" className="text-sm font-normal">
@@ -324,15 +415,32 @@ export default function SlideForm({
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
               <Info className="h-4 w-4 text-blue-600 mt-0.5" />
-              <div className="text-xs text-blue-700">
-                <p>
-                  <strong>Medidas recomendadas:</strong> Responsive automático
-                  (Mobile: 250px, Tablet: 864x422px, Desktop: 1400x484px)
+              <div className="text-xs text-blue-700 space-y-2">
+                <p className="font-semibold">
+                  Medidas recomendadas (Ancho x Alto):
                 </p>
-                <p>
-                  <strong>Formatos:</strong> JPG, PNG, WebP |{" "}
-                  <strong>Máximo:</strong> 5MB
-                </p>
+                <div className="space-y-1">
+                  <div className="flex items-start gap-2">
+                    <span className="font-medium">Desktop:</span>
+                    <span>1400px × 484px (ratio 2.9:1)</span>
+                  </div>
+
+                  <div className="flex items-start gap-2">
+                    <span className="font-medium">Mobile:</span>
+                    <span>
+                      Si no subís imagen mobile, se va a usar esta imagen
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-4 pt-1 border-t border-blue-300">
+                  <span>
+                    <span className="font-medium">Formatos:</span> JPG, PNG,
+                    WebP
+                  </span>
+                  <span>
+                    <span className="font-medium">Máximo:</span> 5MB
+                  </span>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -340,7 +448,7 @@ export default function SlideForm({
 
         <Card>
           <CardContent className="p-6">
-            {previewImage ? (
+            {(previewImage && !removeDesktopImage) ? (
               <div className="relative">
                 <img
                   src={previewImage}
@@ -384,7 +492,8 @@ export default function SlideForm({
                     : "Arrastra y suelta una imagen o haz clic para seleccionar"}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Recomendado: Responsive automático | PNG, JPG, WebP hasta 5MB
+                  <span className="font-medium">Desktop:</span> 1400×484px |
+                  Para desktop
                 </p>
               </div>
             )}
@@ -397,7 +506,7 @@ export default function SlideForm({
               className="hidden"
             />
 
-            {!previewImage && (
+            {(!previewImage || removeDesktopImage) && (
               <Button
                 type="button"
                 variant="outline"
@@ -409,7 +518,7 @@ export default function SlideForm({
               </Button>
             )}
 
-            {previewImage && (
+            {(previewImage && !removeDesktopImage) && (
               <Button
                 type="button"
                 variant="outline"
@@ -423,6 +532,153 @@ export default function SlideForm({
 
             {errors.image && (
               <p className="text-sm text-red-500 mt-2">{errors.image}</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Mobile Image Upload */}
+      <div className="space-y-2">
+        <Label>Imagen Mobile (Opcional)</Label>
+        <p className="text-sm text-gray-600">
+          Si no subís una imagen específica para mobile, se usará la imagen de
+          desktop automáticamente.
+        </p>
+
+        {/* Info sobre medidas mobile */}
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <Info className="h-4 w-4 text-green-600 mt-0.5" />
+              <div className="text-xs text-green-700 space-y-2">
+                <p className="font-semibold">
+                  Medidas recomendadas para Mobile (Ancho x Alto):
+                </p>
+                                 <div className="space-y-1">
+                   <div className="flex items-start gap-2">
+                     <span className="font-medium">Ideal:</span>
+                     <span>
+                       375px × 240px (proporción optimizada, se ve completa)
+                     </span>
+                   </div>
+                   <div className="flex items-start gap-2">
+                     <span className="font-medium">Alternativa:</span>
+                     <span>
+                       414px × 240px (pantallas móviles más grandes)
+                     </span>
+                   </div>
+                   <div className="flex items-start gap-2">
+                     <span className="font-medium">Ratio:</span>
+                     <span>1.56:1 (horizontal, sin distorsión)</span>
+                   </div>
+                 </div>
+                                 <div className="p-2 bg-green-100 rounded border border-green-200">
+                   <span className="font-medium text-green-800">
+                     Aclaración:
+                   </span>
+                   <span className="text-green-800">
+                     {" "}
+                     Usa `object-contain` en mobile para evitar distorsión. Sin bordes redondeados,
+                     ocupa todo el ancho
+                   </span>
+                 </div>
+                <div className="flex flex-wrap gap-4 pt-1 border-t border-green-300">
+                  <span>
+                    <span className="font-medium">Formatos:</span> JPG, PNG,
+                    WebP
+                  </span>
+                  <span>
+                    <span className="font-medium">Máximo:</span> 5MB
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            {(previewMobileImage && !removeMobileImageFlag) ? (
+              <div className="relative">
+                <img
+                  src={previewMobileImage}
+                  alt="Preview Mobile"
+                  className="w-full h-32 object-cover rounded-lg"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={removeMobileImage}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div
+                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+                  isMobileDragOver
+                    ? "border-green-500 bg-green-50 scale-105"
+                    : "border-gray-300 hover:border-gray-400"
+                }`}
+                onClick={() => mobileFileInputRef.current?.click()}
+                onDragOver={handleMobileDragOver}
+                onDragLeave={handleMobileDragLeave}
+                onDrop={handleMobileDrop}
+              >
+                <ImageIcon
+                  className={`h-12 w-12 mx-auto mb-4 transition-colors ${
+                    isMobileDragOver ? "text-green-500" : "text-gray-400"
+                  }`}
+                />
+                <p
+                  className={`mb-2 transition-colors ${
+                    isMobileDragOver
+                      ? "text-green-700 font-medium"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {isMobileDragOver
+                    ? "Suelta la imagen mobile aquí"
+                    : "Arrastra y suelta una imagen mobile o haz clic para seleccionar"}
+                </p>
+                <p className="text-sm text-gray-500">
+                                     <span className="font-medium">Mobile:</span> 375×240px | Sin distorsión, pegado al navbar
+                </p>
+              </div>
+            )}
+
+            <input
+              ref={mobileFileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleMobileImageChange}
+              className="hidden"
+            />
+
+            {(!previewMobileImage || removeMobileImageFlag) && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full mt-4"
+                onClick={() => mobileFileInputRef.current?.click()}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Seleccionar Imagen Mobile (Opcional)
+              </Button>
+            )}
+
+            {(previewMobileImage && !removeMobileImageFlag) && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full mt-4"
+                onClick={() => mobileFileInputRef.current?.click()}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Cambiar Imagen Mobile
+              </Button>
             )}
           </CardContent>
         </Card>

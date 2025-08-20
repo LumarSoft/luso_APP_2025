@@ -37,10 +37,12 @@ const convertProductToDisplay = (product: Product): ProductDisplay => {
 // Helper function to convert API Slide to legacy HeaderSlide format
 const convertSlideToHeaderSlide = (slide: Slide) => {
   const imageUrl = getImageUrl(slide.image_url);
+  const mobileImageUrl = slide.image_url_mobile ? getImageUrl(slide.image_url_mobile) : null;
 
   return {
     id: slide.id.toString(),
     image: imageUrl,
+    image_url_mobile: mobileImageUrl,
     title: slide.title || undefined,
     subtitle: slide.subtitle || undefined,
     link: slide.link || undefined,
