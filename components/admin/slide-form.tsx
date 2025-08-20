@@ -246,10 +246,11 @@ export default function SlideForm({
     if (!slide && !formData.image) {
       newErrors.image = "La imagen es requerida para un nuevo slide";
     }
-    
+
     // Para slides existentes, verificar que no se elimine la imagen desktop sin subir una nueva
     if (slide && removeDesktopImage && !formData.image) {
-      newErrors.image = "No puedes eliminar la imagen desktop sin subir una nueva";
+      newErrors.image =
+        "No puedes eliminar la imagen desktop sin subir una nueva";
     }
 
     setErrors(newErrors);
@@ -448,7 +449,7 @@ export default function SlideForm({
 
         <Card>
           <CardContent className="p-6">
-            {(previewImage && !removeDesktopImage) ? (
+            {previewImage && !removeDesktopImage ? (
               <div className="relative">
                 <img
                   src={previewImage}
@@ -518,7 +519,7 @@ export default function SlideForm({
               </Button>
             )}
 
-            {(previewImage && !removeDesktopImage) && (
+            {previewImage && !removeDesktopImage && (
               <Button
                 type="button"
                 variant="outline"
@@ -554,34 +555,20 @@ export default function SlideForm({
                 <p className="font-semibold">
                   Medidas recomendadas para Mobile (Ancho x Alto):
                 </p>
-                                 <div className="space-y-1">
-                   <div className="flex items-start gap-2">
-                     <span className="font-medium">Ideal:</span>
-                     <span>
-                       375px × 240px (proporción optimizada, se ve completa)
-                     </span>
-                   </div>
-                   <div className="flex items-start gap-2">
-                     <span className="font-medium">Alternativa:</span>
-                     <span>
-                       414px × 240px (pantallas móviles más grandes)
-                     </span>
-                   </div>
-                   <div className="flex items-start gap-2">
-                     <span className="font-medium">Ratio:</span>
-                     <span>1.56:1 (horizontal, sin distorsión)</span>
-                   </div>
-                 </div>
-                                 <div className="p-2 bg-green-100 rounded border border-green-200">
-                   <span className="font-medium text-green-800">
-                     Aclaración:
-                   </span>
-                   <span className="text-green-800">
-                     {" "}
-                     Usa `object-contain` en mobile para evitar distorsión. Sin bordes redondeados,
-                     ocupa todo el ancho
-                   </span>
-                 </div>
+                <div className="space-y-1">
+                  <div className="flex items-start gap-2">
+                    <span className="font-medium">Ideal:</span>
+                    <span>
+                      375px × 240px (proporción optimizada, se ve completa)
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-2">
+                    <span className="font-medium">Ratio:</span>
+                    <span>1.56:1 (horizontal, sin distorsión)</span>
+                  </div>
+                </div>
+
                 <div className="flex flex-wrap gap-4 pt-1 border-t border-green-300">
                   <span>
                     <span className="font-medium">Formatos:</span> JPG, PNG,
@@ -598,7 +585,7 @@ export default function SlideForm({
 
         <Card>
           <CardContent className="p-6">
-            {(previewMobileImage && !removeMobileImageFlag) ? (
+            {previewMobileImage && !removeMobileImageFlag ? (
               <div className="relative">
                 <img
                   src={previewMobileImage}
@@ -644,7 +631,8 @@ export default function SlideForm({
                     : "Arrastra y suelta una imagen mobile o haz clic para seleccionar"}
                 </p>
                 <p className="text-sm text-gray-500">
-                                     <span className="font-medium">Mobile:</span> 375×240px | Sin distorsión, pegado al navbar
+                  <span className="font-medium">Mobile:</span> 375×240px | Sin
+                  distorsión, pegado al navbar
                 </p>
               </div>
             )}
@@ -669,7 +657,7 @@ export default function SlideForm({
               </Button>
             )}
 
-            {(previewMobileImage && !removeMobileImageFlag) && (
+            {previewMobileImage && !removeMobileImageFlag && (
               <Button
                 type="button"
                 variant="outline"
