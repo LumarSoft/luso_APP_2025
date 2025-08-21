@@ -125,12 +125,6 @@ export function Footer() {
               </a>
 
               <a
-                href="/nosotros"
-                className="block text-gray-600 hover:text-gray-800 transition-colors text-sm"
-              >
-                Sobre Nosotros
-              </a>
-              <a
                 href="/servicio-tecnico"
                 className="block text-gray-600 hover:text-gray-800 transition-colors text-sm"
               >
