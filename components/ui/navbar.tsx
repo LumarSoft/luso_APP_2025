@@ -97,10 +97,10 @@ export function Navbar() {
     <nav className="bg-gradient-to-r from-white to-orange-50 shadow-lg border-b border-orange-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+          {/* Logo - Más compacto */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center group">
-              <div className="relative h-26 w-32 sm:h-38 sm:w-48 transition-all duration-200 group-hover:scale-105">
+              <div className="relative h-20 w-24 sm:h-24 sm:w-28 transition-all duration-200 group-hover:scale-105">
                 <Image
                   src="/98b87bc8-8177-445e-b283-da11fce10e6e.png"
                   alt="LusoInsumos - Redes y Soporte IT"
@@ -112,18 +112,18 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+          {/* Desktop Navigation - Espaciado optimizado */}
+          <div className="hidden md:block flex-1">
+            <div className="flex items-baseline justify-center space-x-2 lg:space-x-3 xl:space-x-4">
               <Link
                 href="/"
-                className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 relative group"
+                className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200 relative group whitespace-nowrap"
               >
                 <span className="relative z-10">Inicio</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-red-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 rounded-md transition-all duration-200"></div>
               </Link>
 
-              {/* Categories Dropdown */}
+              {/* Categories Dropdown - Espaciado reducido */}
               {!isLoading &&
                 categories.map((category) => (
                   <div
@@ -132,7 +132,7 @@ export function Navbar() {
                     onMouseEnter={() => setOpenDropdown(category.id)}
                     onMouseLeave={() => setOpenDropdown(null)}
                   >
-                    <button className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1 relative group">
+                    <button className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1 relative group whitespace-nowrap">
                       <span className="relative z-10">{category.name}</span>
                       {category.subcategories &&
                         category.subcategories.length > 0 && (
@@ -187,7 +187,7 @@ export function Navbar() {
 
               <Link
                 href="/productos"
-                className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 relative group"
+                className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200 relative group whitespace-nowrap"
               >
                 <span className="relative z-10">Todos los Productos</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-red-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 rounded-md transition-all duration-200"></div>
@@ -195,15 +195,15 @@ export function Navbar() {
 
               <Link
                 href="/servicio-tecnico"
-                className="text-white bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                className="text-white bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 whitespace-nowrap"
               >
                 Servicio Técnico
               </Link>
             </div>
           </div>
 
-          {/* Search & Mobile menu button */}
-          <div className="flex items-center space-x-2">
+          {/* Search & Mobile menu button - Espaciado optimizado */}
+          <div className="flex items-center space-x-1">
             {/* Search button */}
             <button
               onClick={() => setIsSearchOpen(true)}
