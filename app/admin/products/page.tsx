@@ -25,16 +25,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  WideDialog,
-  WideDialogContent,
-  WideDialogDescription,
-  WideDialogHeader,
-  WideDialogTitle,
-} from "@/components/ui/wide-dialog";
-import { Badge } from "@/components/ui/badge";
+  Badge
+} from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -234,6 +228,16 @@ export default function ProductsPage() {
     loadProducts();
   };
 
+  const handleOpenForm = () => {
+    setIsFormOpen(true);
+    setEditingProduct(null);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setEditingProduct(null);
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("es-AR", {
       style: "currency",
@@ -253,7 +257,10 @@ export default function ProductsPage() {
       );
     } else if (stock < 10) {
       return (
-        <Badge variant="secondary" className="gap-1 bg-orange-100 text-orange-800 hover:bg-orange-200">
+        <Badge
+          variant="secondary"
+          className="gap-1 bg-orange-100 text-orange-800 hover:bg-orange-200"
+        >
           <TrendingDown className="h-3 w-3" />
           Stock bajo
         </Badge>
@@ -282,22 +289,34 @@ export default function ProductsPage() {
   };
 
   const getSortTooltip = (field: SortField) => {
-    if (sortField !== field) return `Ordenar por ${field === 'name' ? 'nombre' : field === 'price' ? 'precio' : 'stock'}`;
-    
-    const fieldName = field === 'name' ? 'nombre' : field === 'price' ? 'precio' : 'stock';
+    if (sortField !== field)
+      return `Ordenar por ${
+        field === "name" ? "nombre" : field === "price" ? "precio" : "stock"
+      }`;
+
+    const fieldName =
+      field === "name" ? "nombre" : field === "price" ? "precio" : "stock";
     if (sortDirection === "asc") {
-      switch(field) {
-        case 'name': return 'Ordenado A-Z, clic para Z-A';
-        case 'price': return 'Ordenado: más barato → más caro, clic para invertir';
-        case 'stock': return 'Ordenado: menor → mayor stock, clic para invertir';
-        default: return `Ordenado ascendente por ${fieldName}`;
+      switch (field) {
+        case "name":
+          return "Ordenado A-Z, clic para Z-A";
+        case "price":
+          return "Ordenado: más barato → más caro, clic para invertir";
+        case "stock":
+          return "Ordenado: menor → mayor stock, clic para invertir";
+        default:
+          return `Ordenado ascendente por ${fieldName}`;
       }
     } else {
-      switch(field) {
-        case 'name': return 'Ordenado Z-A, clic para A-Z';
-        case 'price': return 'Ordenado: más caro → más barato, clic para invertir';
-        case 'stock': return 'Ordenado: mayor → menor stock, clic para invertir';
-        default: return `Ordenado descendente por ${fieldName}`;
+      switch (field) {
+        case "name":
+          return "Ordenado Z-A, clic para A-Z";
+        case "price":
+          return "Ordenado: más caro → más barato, clic para invertir";
+        case "stock":
+          return "Ordenado: mayor → menor stock, clic para invertir";
+        default:
+          return `Ordenado descendente por ${fieldName}`;
       }
     }
   };
@@ -332,7 +351,7 @@ export default function ProductsPage() {
               </div>
               <div className="flex items-center gap-3">
                 <Button
-                  onClick={() => setIsFormOpen(true)}
+                  onClick={handleOpenForm}
                   className="shadow-sm"
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -456,7 +475,7 @@ export default function ProductsPage() {
                 {/* Filtros expandibles */}
                 {showFilters && (
                   <div className="border-t pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-700 mb-2 block">
                           Categoría
@@ -516,7 +535,7 @@ export default function ProductsPage() {
                         </Select>
                       </div>
 
-                      <div>
+                      <div className="sm:col-span-2 lg:col-span-1">
                         <label className="text-sm font-medium text-gray-700 mb-2 block">
                           Productos por página
                         </label>
@@ -590,8 +609,8 @@ export default function ProductsPage() {
                           Producto {getSortIcon("name")}
                         </Button>
                       </TableHead>
-                      <TableHead>Categoría</TableHead>
-                      <TableHead>
+                      <TableHead className="hidden md:table-cell">Categoría</TableHead>
+                      <TableHead className="hidden lg:table-cell">
                         <Button
                           variant="ghost"
                           onClick={() => handleSort("price")}
@@ -601,7 +620,7 @@ export default function ProductsPage() {
                           Precio {getSortIcon("price")}
                         </Button>
                       </TableHead>
-                      <TableHead>
+                      <TableHead className="hidden lg:table-cell">
                         <Button
                           variant="ghost"
                           onClick={() => handleSort("stock")}
@@ -611,8 +630,8 @@ export default function ProductsPage() {
                           Stock {getSortIcon("stock")}
                         </Button>
                       </TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead>Destacado</TableHead>
+                      <TableHead className="hidden sm:table-cell">Estado</TableHead>
+                      <TableHead className="hidden xl:table-cell">Destacado</TableHead>
                       <TableHead className="w-20">Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -687,9 +706,18 @@ export default function ProductsPage() {
                               <p className="text-sm text-gray-500 truncate mt-1">
                                 {product.description}
                               </p>
+                              {/* Información adicional para móviles */}
+                              <div className="md:hidden mt-2 space-y-1">
+                                <p className="text-sm font-medium text-green-600">
+                                  {formatPrice(product.price)}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  Stock: {product.stock}
+                                </p>
+                              </div>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden md:table-cell">
                             <div className="text-sm">
                               <span className="font-medium">
                                 {product.category_name}
@@ -701,10 +729,10 @@ export default function ProductsPage() {
                               )}
                             </div>
                           </TableCell>
-                          <TableCell className="font-bold text-lg">
+                          <TableCell className="hidden lg:table-cell font-bold text-lg">
                             {formatPrice(product.price)}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden lg:table-cell">
                             <span
                               className={`font-bold text-lg ${
                                 product.stock === 0
@@ -717,11 +745,17 @@ export default function ProductsPage() {
                               {product.stock}
                             </span>
                           </TableCell>
-                          <TableCell>{getStockBadge(product.stock)}</TableCell>
-                          <TableCell>
+                          <TableCell className="hidden sm:table-cell">{getStockBadge(product.stock)}</TableCell>
+                          <TableCell className="hidden xl:table-cell">
                             <Badge
-                              variant={product.featured === 1 ? "default" : "secondary"}
-                              className={product.featured === 1 ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+                              variant={
+                                product.featured === 1 ? "default" : "secondary"
+                              }
+                              className={
+                                product.featured === 1
+                                  ? "bg-yellow-500 hover:bg-yellow-600"
+                                  : ""
+                              }
                             >
                               {product.featured === 1 ? "Destacado" : "Normal"}
                             </Badge>
@@ -765,8 +799,8 @@ export default function ProductsPage() {
 
               {/* Paginación mejorada */}
               {totalPages > 1 && (
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 px-6 py-4 border-t bg-gray-50">
-                  <p className="text-sm text-gray-700">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 px-4 sm:px-6 py-4 border-t bg-gray-50">
+                  <p className="text-sm text-gray-700 text-center lg:text-left">
                     Mostrando{" "}
                     <span className="font-semibold">
                       {(currentPage - 1) * itemsPerPage + 1}
@@ -778,12 +812,13 @@ export default function ProductsPage() {
                     de <span className="font-semibold">{totalItems}</span>{" "}
                     productos
                   </p>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-center lg:justify-end space-x-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setCurrentPage(1)}
                       disabled={currentPage === 1}
+                      className="hidden sm:inline-flex"
                     >
                       Primero
                     </Button>
@@ -794,7 +829,7 @@ export default function ProductsPage() {
                       disabled={currentPage === 1}
                     >
                       <ChevronLeft className="h-4 w-4 mr-1" />
-                      Anterior
+                      <span className="hidden sm:inline">Anterior</span>
                     </Button>
                     <div className="flex items-center space-x-1">
                       {/* Páginas simplificadas para mobile */}
@@ -811,7 +846,7 @@ export default function ProductsPage() {
                       onClick={() => setCurrentPage(currentPage + 1)}
                       disabled={currentPage === totalPages}
                     >
-                      Siguiente
+                      <span className="hidden sm:inline">Siguiente</span>
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                     <Button
@@ -819,6 +854,7 @@ export default function ProductsPage() {
                       size="sm"
                       onClick={() => setCurrentPage(totalPages)}
                       disabled={currentPage === totalPages}
+                      className="hidden sm:inline-flex"
                     >
                       Último
                     </Button>
@@ -828,30 +864,58 @@ export default function ProductsPage() {
             </CardContent>
           </Card>
 
-          {/* Product Form Dialog */}
-          <WideDialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-            <WideDialogContent className="max-h-[90vh] overflow-y-auto">
-              <WideDialogHeader>
-                <WideDialogTitle>
-                  {editingProduct ? "Editar Producto" : "Nuevo Producto"}
-                </WideDialogTitle>
-                <WideDialogDescription>
-                  {editingProduct
-                    ? "Modifica los datos del producto"
-                    : "Completa los datos para crear un nuevo producto"}
-                </WideDialogDescription>
-              </WideDialogHeader>
-              <ProductForm
-                product={editingProduct}
-                categories={categories}
-                onSubmit={handleFormSubmit}
-                onCancel={() => {
-                  setIsFormOpen(false);
-                  setEditingProduct(null);
-                }}
-              />
-            </WideDialogContent>
-          </WideDialog>
+          {/* Modal del Formulario de Productos */}
+          <Dialog open={isFormOpen} onOpenChange={handleCloseForm}>
+            <DialogContent 
+              className="max-w-4xl w-[95vw] max-h-[90vh] overflow-hidden p-0 border-0 shadow-2xl"
+              style={{
+                maxWidth: 'min(896px, 95vw)',
+                width: '95vw',
+                maxHeight: '90vh',
+                padding: 0,
+                borderRadius: '12px'
+              }}
+              showCloseButton={false}
+            >
+              {/* Header del Modal */}
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 rounded-t-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <DialogTitle className="text-lg sm:text-xl font-semibold text-gray-900">
+                      {editingProduct ? "Editar Producto" : "Nuevo Producto"}
+                    </DialogTitle>
+                    <DialogDescription className="text-sm text-gray-600 mt-1">
+                      {editingProduct
+                        ? "Modifica los datos del producto"
+                        : "Completa los datos para crear un nuevo producto"}
+                    </DialogDescription>
+                  </div>
+                  
+                  {/* Botón de cerrar personalizado */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCloseForm}
+                    className="h-8 w-8 p-0 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Contenido del Formulario con Scroll */}
+              <div className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 120px)' }}>
+                <div className="px-4 sm:px-6 py-4">
+                  <ProductForm
+                    product={editingProduct}
+                    categories={categories}
+                    onSubmit={handleFormSubmit}
+                    onCancel={handleCloseForm}
+                  />
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <Dialog
             open={!!deletingProduct}

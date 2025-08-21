@@ -10,6 +10,13 @@ import { productService, categoryService, getImageUrl } from "@/lib/api";
 import { Product, Category, Subcategory, ProductFormData } from "@/lib/types";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProductFormProps {
   product?: Product | null;
@@ -365,7 +372,7 @@ export default function ProductForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl mx-auto">
+    <form onSubmit={handleSubmit} className="space-y-6 w-full">
       {/* Basic Information */}
       <div className="space-y-4">
         <div className="space-y-2">
@@ -400,7 +407,7 @@ export default function ProductForm({
       </div>
 
       {/* Price and Stock */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="price">Precio (ARS) *</Label>
           <Input
@@ -460,23 +467,32 @@ export default function ProductForm({
       </div>
 
       {/* Category and Subcategory */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="category">Categoría *</Label>
-          <select
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          <Select
             value={formData.category_id.toString()}
-            onChange={(e) =>
-              handleInputChange("category_id", parseInt(e.target.value))
+            onValueChange={(value) =>
+              handleInputChange("category_id", parseInt(value))
             }
           >
-            <option value="0">Seleccionar categoría</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id.toString()}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-10">
+              <SelectValue placeholder="Seleccionar categoría" />
+            </SelectTrigger>
+            <SelectContent 
+              position="popper" 
+              side="top" 
+              align="start" 
+              className="w-full min-w-[200px]"
+              sideOffset={4}
+            >
+              {categories.map((category: any) => (
+                <SelectItem key={category.id} value={category.id.toString()}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {errors.category_id && (
             <p className="text-sm text-red-500">{errors.category_id}</p>
           )}
@@ -484,34 +500,45 @@ export default function ProductForm({
 
         <div className="space-y-2">
           <Label htmlFor="subcategory">Subcategoría</Label>
-          <select
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          <Select
             value={formData.subcategory_id?.toString() || ""}
-            onChange={(e) =>
+            onValueChange={(value) =>
               handleInputChange(
                 "subcategory_id",
-                e.target.value ? parseInt(e.target.value) : null
+                value ? parseInt(value) : null
               )
             }
             disabled={!formData.category_id || isLoadingSubcategories}
           >
-            <option value="">
-              {isLoadingSubcategories
-                ? "Cargando subcategorías..."
-                : "Seleccionar subcategoría (opcional)"}
-            </option>
-            {subcategories.map((subcategory) => (
-              <option key={subcategory.id} value={subcategory.id.toString()}>
-                {subcategory.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-10">
+              <SelectValue 
+                placeholder={
+                  isLoadingSubcategories
+                    ? "Cargando subcategorías..."
+                    : "Seleccionar subcategoría (opcional)"
+                } 
+              />
+            </SelectTrigger>
+            <SelectContent 
+              position="popper" 
+              side="top" 
+              align="start" 
+              className="w-full min-w-[200px]"
+              sideOffset={4}
+            >
+              {subcategories.map((subcategory: any) => (
+                <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                  {subcategory.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       {/* Images Upload */}
       <div className="space-y-2">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
           <Label>Imágenes del Producto (Máximo 5)</Label>
           {previewImages.length > 0 && (
             <Button
@@ -519,32 +546,34 @@ export default function ProductForm({
               variant="ghost"
               size="sm"
               onClick={removeAllImages}
-              className="text-red-600 hover:text-red-500"
+              className="text-red-600 hover:text-red-500 self-start sm:self-auto"
             >
               Eliminar todas
             </Button>
           )}
         </div>
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+              className={`border-2 border-dashed rounded-lg p-4 sm:p-8 text-center cursor-pointer transition-all duration-200 touch-manipulation ${
                 isDragOver
                   ? "border-blue-500 bg-blue-50 scale-105"
-                  : "border-gray-300 hover:border-gray-400"
+                  : "border-gray-300 hover:border-gray-400 active:border-blue-400"
               }`}
               onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
+              onTouchStart={() => setIsDragOver(true)}
+              onTouchEnd={() => setIsDragOver(false)}
             >
               <ImageIcon
-                className={`h-12 w-12 mx-auto mb-4 transition-colors ${
+                className={`h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 transition-colors ${
                   isDragOver ? "text-blue-500" : "text-gray-400"
                 }`}
               />
               <p
-                className={`mb-2 transition-colors ${
+                className={`mb-2 text-sm sm:text-base transition-colors ${
                   isDragOver ? "text-blue-700 font-medium" : "text-gray-600"
                 }`}
               >
@@ -552,11 +581,11 @@ export default function ProductForm({
                   ? "Suelta las imágenes aquí"
                   : "Arrastra y suelta imágenes o haz clic para seleccionar"}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500">
                 PNG, JPG, JPEG hasta 2MB cada una. Máximo 5 imágenes.
               </p>
               {previewImages.length > 0 && (
-                <p className="text-sm text-blue-600 mt-2">
+                <p className="text-xs sm:text-sm text-blue-600 mt-2">
                   {previewImages.length}/5 imágenes seleccionadas
                 </p>
               )}
@@ -585,25 +614,25 @@ export default function ProductForm({
 
             {/* Images Preview Grid */}
             {previewImages.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mt-4 sm:mt-6">
                 {previewImages.map((preview, index) => (
                   <div key={index} className="relative group">
                     <img
                       src={preview}
                       alt={`Vista previa ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg border"
+                      className="w-full h-24 sm:h-32 object-cover rounded-lg border"
                     />
                     <Button
                       type="button"
                       variant="destructive"
                       size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 sm:h-8 sm:w-8 p-0"
                       onClick={() => removeImage(index)}
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                     {index === 0 && (
-                      <div className="absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 bg-blue-500 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs">
                         Principal
                       </div>
                     )}
@@ -621,12 +650,12 @@ export default function ProductForm({
           type="button"
           variant="outline"
           onClick={onCancel}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto order-2 sm:order-1"
           disabled={isLoading}
         >
           Cancelar
         </Button>
-        <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+        <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2" disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
