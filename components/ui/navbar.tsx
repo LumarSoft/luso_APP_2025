@@ -97,8 +97,8 @@ export function Navbar() {
     <nav className="bg-gradient-to-r from-white to-orange-50 shadow-lg border-b border-orange-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0">
+          {/* Logo - Fixed width to prevent compression */}
+          <div className="flex-shrink-0 w-48">
             <Link href="/" className="flex items-center group">
               <div className="relative h-26 w-32 sm:h-38 sm:w-48 transition-all duration-200 group-hover:scale-105">
                 <Image
@@ -112,109 +112,112 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+          {/* Desktop Navigation - Flexible center with overflow handling */}
+          <div className="hidden lg:block flex-1 mx-8">
+            <div className="flex items-baseline justify-center space-x-2 min-w-0">
               <Link
                 href="/"
-                className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 relative group"
+                className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 relative group flex-shrink-0"
               >
                 <span className="relative z-10">Inicio</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-red-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 rounded-md transition-all duration-200"></div>
               </Link>
 
-              {/* Categories Dropdown */}
-              {!isLoading &&
-                categories.map((category) => (
-                  <div
-                    key={category.id}
-                    className="relative group"
-                    onMouseEnter={() => setOpenDropdown(category.id)}
-                    onMouseLeave={() => setOpenDropdown(null)}
-                  >
-                    <button className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1 relative group">
-                      <span className="relative z-10">{category.name}</span>
+              {/* Categories Dropdown - Scrollable if needed */}
+              <div className="flex items-baseline space-x-1 min-w-0 overflow-hidden">
+                {!isLoading &&
+                  categories.map((category) => (
+                    <div
+                      key={category.id}
+                      className="relative group flex-shrink-0"
+                      onMouseEnter={() => setOpenDropdown(category.id)}
+                      onMouseLeave={() => setOpenDropdown(null)}
+                    >
+                      <button className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1 relative group whitespace-nowrap">
+                        <span className="relative z-10">{category.name}</span>
+                        {category.subcategories &&
+                          category.subcategories.length > 0 && (
+                            <ChevronDown className="h-4 w-4 relative z-10 group-hover:text-red-600 transition-colors duration-200" />
+                          )}
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-red-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 rounded-md transition-all duration-200"></div>
+                      </button>
+
+                      {/* Dropdown Menu */}
                       {category.subcategories &&
                         category.subcategories.length > 0 && (
-                          <ChevronDown className="h-4 w-4 relative z-10 group-hover:text-red-600 transition-colors duration-200" />
-                        )}
-                      <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-red-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 rounded-md transition-all duration-200"></div>
-                    </button>
-
-                    {/* Dropdown Menu */}
-                    {category.subcategories &&
-                      category.subcategories.length > 0 && (
-                        <div
-                          className={`absolute left-0 mt-1 w-56 rounded-lg shadow-xl bg-white border border-gray-200 transition-all duration-200 z-50 ${
-                            openDropdown === category.id
-                              ? "opacity-100 scale-100 visible"
-                              : "opacity-0 scale-95 invisible"
-                          }`}
-                        >
-                          <div className="py-3" role="menu">
-                            {/* Category Title */}
-                            <div className="px-4 mb-2">
-                              <Link
-                                href={`/productos?categoria=${category.id}`}
-                                className="block text-sm font-bold bg-gradient-to-r from-gray-900 to-orange-700 bg-clip-text text-transparent hover:from-orange-600 hover:to-red-600 transition-all duration-200 uppercase tracking-wider"
-                                role="menuitem"
-                              >
-                                {category.name}
-                              </Link>
-                            </div>
-
-                            {/* Divider */}
-                            <div className="border-t border-gray-100 my-2"></div>
-
-                            {/* Subcategories */}
-                            <div className="px-2">
-                              {category.subcategories.map((subcategory) => (
+                          <div
+                            className={`absolute left-0 mt-1 w-56 rounded-lg shadow-xl bg-white border border-gray-200 transition-all duration-200 z-50 ${
+                              openDropdown === category.id
+                                ? "opacity-100 scale-100 visible"
+                                : "opacity-0 scale-95 invisible"
+                            }`}
+                          >
+                            <div className="py-3" role="menu">
+                              {/* Category Title */}
+                              <div className="px-4 mb-2">
                                 <Link
-                                  key={subcategory.id}
-                                  href={`/productos?categoria=${category.id}&subcategoria=${subcategory.id}`}
-                                  className="block px-2 py-2 text-sm text-gray-600 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 hover:text-orange-600 rounded-md transition-all duration-200 font-normal hover:shadow-sm"
+                                  href={`/productos?categoria=${category.id}`}
+                                  className="block text-sm font-bold bg-gradient-to-r from-gray-900 to-orange-700 bg-clip-text text-transparent hover:from-orange-600 hover:to-red-600 transition-all duration-200 uppercase tracking-wider"
                                   role="menuitem"
                                 >
-                                  {subcategory.name}
+                                  {category.name}
                                 </Link>
-                              ))}
+                              </div>
+
+                              {/* Divider */}
+                              <div className="border-t border-gray-100 my-2"></div>
+
+                              {/* Subcategories */}
+                              <div className="px-2">
+                                {category.subcategories.map((subcategory) => (
+                                  <Link
+                                    key={subcategory.id}
+                                    href={`/productos?categoria=${category.id}&subcategoria=${subcategory.id}`}
+                                    className="block px-2 py-2 text-sm text-gray-600 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 hover:text-orange-600 rounded-md transition-all duration-200 font-normal hover:shadow-sm"
+                                    role="menuitem"
+                                  >
+                                    {subcategory.name}
+                                  </Link>
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                  </div>
-                ))}
+                        )}
+                    </div>
+                  ))}
+              </div>
 
               <Link
                 href="/productos"
-                className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 relative group"
+                className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 relative group flex-shrink-0"
               >
                 <span className="relative z-10">Todos los Productos</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-red-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 rounded-md transition-all duration-200"></div>
               </Link>
-
-              <Link
-                href="/servicio-tecnico"
-                className="text-white bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-              >
-                Servicio Técnico
-              </Link>
             </div>
           </div>
 
-          {/* Search & Mobile menu button */}
-          <div className="flex items-center space-x-2">
+          {/* Right side - Fixed width to prevent compression */}
+          <div className="flex-shrink-0 w-48 flex items-center justify-end space-x-3">
+            {/* Service Technical Button */}
+            <Link
+              href="/servicio-tecnico"
+              className="text-white bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex-shrink-0"
+            >
+              Servicio Técnico
+            </Link>
+
             {/* Search button */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="p-2 rounded-md text-gray-400 hover:text-orange-600 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 transition-all duration-200 hover:shadow-sm"
+              className="p-2 rounded-md text-gray-400 hover:text-orange-600 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 transition-all duration-200 hover:shadow-sm flex-shrink-0"
               aria-label="Buscar productos"
             >
               <Search className="h-5 w-5" />
             </button>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <button
                 onClick={toggleMobileMenu}
                 className="p-2 rounded-md text-gray-400 hover:text-orange-600 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 transition-all duration-200 hover:shadow-sm"
@@ -231,7 +234,7 @@ export function Navbar() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 border-t border-gray-200">
               <Link
                 href="/"
