@@ -28,6 +28,15 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
   const [subcategoryName, setSubcategoryName] = useState<string>("");
   const [isLoadingCategoryNames, setIsLoadingCategoryNames] = useState(false);
 
+  // Estados para filtros
+  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderDirection, setOrderDirection] = useState<string>("");
+  const [stockFilter, setStockFilter] = useState<string>("");
+
+  // Estados para dropdowns personalizados
+  const [orderDropdownOpen, setOrderDropdownOpen] = useState(false);
+  const [stockDropdownOpen, setStockDropdownOpen] = useState(false);
+
   const { addItem } = useCart();
   const { addToast } = useToast();
 
@@ -36,7 +45,31 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
   useEffect(() => {
     loadProducts();
     loadCategoryNames();
-  }, [categoria, subcategoria, search, currentPage]);
+  }, [
+    categoria,
+    subcategoria,
+    search,
+    currentPage,
+    orderBy,
+    orderDirection,
+    stockFilter,
+  ]);
+
+  // Cerrar dropdowns al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".dropdown-container")) {
+        setOrderDropdownOpen(false);
+        setStockDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const loadCategoryNames = async () => {
     if (categoria) {
@@ -44,7 +77,9 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         setIsLoadingCategoryNames(true);
         const categoriesResponse = await categoryService.getAll();
         if (categoriesResponse.success && categoriesResponse.data) {
-          const categories = (categoriesResponse.data as { categories: Category[] }).categories;
+          const categories = (
+            categoriesResponse.data as { categories: Category[] }
+          ).categories;
           const foundCategory = categories.find(
             (cat: Category) => cat.id.toString() === categoria
           );
@@ -57,7 +92,9 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
               const subcategoriesResponse =
                 await categoryService.getSubcategories(categoria as string);
               if (subcategoriesResponse.success && subcategoriesResponse.data) {
-                const subcategories = (subcategoriesResponse.data as { subcategories: any[] }).subcategories;
+                const subcategories = (
+                  subcategoriesResponse.data as { subcategories: any[] }
+                ).subcategories;
                 const foundSubcategory = subcategories.find(
                   (sub: any) => sub.id.toString() === subcategoria
                 );
@@ -91,14 +128,39 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         ...(search && { search: search as string }),
         ...(categoria && { category: categoria as string }),
         ...(subcategoria && { subcategory: subcategoria as string }),
+        ...(orderBy && { sort_by: orderBy }),
+        ...(orderDirection && { sort_direction: orderDirection }),
+        ...(stockFilter && { stock_filter: stockFilter }),
       };
 
       console.log("Loading products with params:", params);
-      console.log("URL params - categoria:", categoria, "subcategoria:", subcategoria, "search:", search);
+      console.log(
+        "URL params - categoria:",
+        categoria,
+        "subcategoria:",
+        subcategoria,
+        "search:",
+        search
+      );
+      console.log(
+        "Order params - orderBy:",
+        orderBy,
+        "orderDirection:",
+        orderDirection
+      );
 
       const response = await productService.getAll(params);
 
       console.log("API response:", response);
+      if (response.success && response.data) {
+        const data = response.data as { products: Product[]; pagination?: any };
+        console.log(
+          "Products after ordering:",
+          data.products
+            ?.slice(0, 3)
+            ?.map((p: Product) => ({ name: p.name, price: p.price }))
+        );
+      }
 
       if (response.success && response.data) {
         const data = response.data as { products: Product[]; pagination?: any };
@@ -331,6 +393,213 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
                         ` • Página ${currentPage} de ${totalPages}`}
                     </p>
                   </div>
+
+                  {/* Filtros de Ordenamiento */}
+                  <div className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    {/* Dropdown de Ordenamiento */}
+                    <div className="flex items-center gap-2">
+                      <div className="relative dropdown-container">
+                        <button
+                          onClick={() =>
+                            setOrderDropdownOpen(!orderDropdownOpen)
+                          }
+                          className="px-4 py-2.5 border-2 border-orange-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-400 bg-white shadow-sm hover:border-orange-300 transition-all duration-200 cursor-pointer min-w-[160px] text-center font-medium flex items-center justify-between"
+                        >
+                          <span>
+                            {orderBy === "price" &&
+                              orderDirection === "ASC" &&
+                              "Menor precio"}
+                            {orderBy === "price" &&
+                              orderDirection === "DESC" &&
+                              "Mayor precio"}
+                            {(!orderBy || !orderDirection) && "Ordenar por"}
+                          </span>
+                          <svg
+                            className={`w-4 h-4 ml-2 transition-transform duration-200 ${
+                              orderDropdownOpen ? "rotate-180" : ""
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {orderDropdownOpen && (
+                          <div className="absolute z-50 mt-1 w-full bg-white border-2 border-orange-200 rounded-lg shadow-lg overflow-hidden">
+                            <div className="py-1">
+                              <button
+                                onClick={() => {
+                                  setOrderBy("");
+                                  setOrderDirection("");
+                                  setOrderDropdownOpen(false);
+                                  setCurrentPage(1);
+                                }}
+                                className={`w-full px-4 py-3 text-left text-sm hover:bg-orange-50 transition-colors duration-150 ${
+                                  !orderBy && !orderDirection
+                                    ? "bg-orange-100 text-orange-700 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                Todos
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setOrderBy("price");
+                                  setOrderDirection("ASC");
+                                  setOrderDropdownOpen(false);
+                                  setCurrentPage(1);
+                                }}
+                                className={`w-full px-4 py-3 text-left text-sm hover:bg-orange-50 transition-colors duration-150 ${
+                                  orderBy === "price" &&
+                                  orderDirection === "ASC"
+                                    ? "bg-orange-100 text-orange-700 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                Menor precio
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setOrderBy("price");
+                                  setOrderDirection("DESC");
+                                  setOrderDropdownOpen(false);
+                                  setCurrentPage(1);
+                                }}
+                                className={`w-full px-4 py-3 text-left text-sm hover:bg-orange-50 transition-colors duration-150 ${
+                                  orderBy === "price" &&
+                                  orderDirection === "DESC"
+                                    ? "bg-orange-100 text-orange-700 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                Mayor precio
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Dropdown de Stock */}
+                    <div className="flex items-center gap-2">
+                      <div className="relative dropdown-container">
+                        {/* Dropdown Menu */}
+                        {stockDropdownOpen && (
+                          <div className="absolute z-50 mt-1 w-full bg-white border-2 border-red-200 rounded-lg shadow-lg overflow-hidden">
+                            <div className="py-1">
+                              <button
+                                onClick={() => {
+                                  setStockFilter("");
+                                  setStockDropdownOpen(false);
+                                  setCurrentPage(1);
+                                }}
+                                className={`w-full px-4 py-3 text-left text-sm hover:bg-red-50 transition-colors duration-150 ${
+                                  stockFilter === ""
+                                    ? "bg-red-100 text-red-700 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                Todos los productos
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setStockFilter("in_stock");
+                                  setStockDropdownOpen(false);
+                                  setCurrentPage(1);
+                                }}
+                                className={`w-full px-4 py-3 text-left text-sm hover:bg-red-50 transition-colors duration-150 ${
+                                  stockFilter === "in_stock"
+                                    ? "bg-red-100 text-red-700 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                En stock (≥10)
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setStockFilter("low_stock");
+                                  setStockDropdownOpen(false);
+                                  setCurrentPage(1);
+                                }}
+                                className={`w-full px-4 py-3 text-left text-sm hover:bg-red-50 transition-colors duration-150 ${
+                                  stockFilter === "low_stock"
+                                    ? "bg-red-100 text-red-700 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                Stock bajo (1-9)
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setStockFilter("out_of_stock");
+                                  setStockDropdownOpen(false);
+                                  setCurrentPage(1);
+                                }}
+                                className={`w-full px-4 py-3 text-left text-sm hover:bg-red-50 transition-colors duration-150 ${
+                                  stockFilter === "out_of_stock"
+                                    ? "bg-red-100 text-red-700 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                Agotado
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Botón para limpiar filtros */}
+                    {(orderBy !== "" ||
+                      orderDirection !== "" ||
+                      stockFilter !== "") && (
+                      <button
+                        onClick={() => {
+                          setOrderBy("");
+                          setOrderDirection("");
+                          setStockFilter("");
+                          setCurrentPage(1);
+                        }}
+                        className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-white bg-white hover:bg-gradient-to-r hover:from-gray-600 hover:to-gray-700 border-2 border-gray-300 hover:border-gray-600 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                      >
+                        Limpiar filtros
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Indicador de filtros activos */}
+                  {(orderBy !== "" ||
+                    orderDirection !== "" ||
+                    stockFilter !== "") && (
+                    <div className="mb-4 text-center">
+                      <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-4 py-2">
+                        <span className="text-sm text-orange-700 font-medium">
+                          Filtros activos:
+                        </span>
+                        {orderBy !== "" || orderDirection !== "" ? (
+                          <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
+                            {orderBy === "price" && "Precio"}
+                            {orderDirection === "ASC" ? "↓ Menor" : "↑ Mayor"}
+                          </span>
+                        ) : null}
+                        {stockFilter && (
+                          <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
+                            {stockFilter === "in_stock" && "Stock alto"}
+                            {stockFilter === "low_stock" && "Stock bajo"}
+                            {stockFilter === "out_of_stock" && "Agotado"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Products Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8 auto-rows-fr max-w-7xl mx-auto">
