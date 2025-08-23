@@ -129,27 +129,28 @@ export function Navbar() {
                   <div
                     key={category.id}
                     className="relative group"
-                    onMouseEnter={() => setOpenDropdown(category.id)}
-                    onMouseLeave={() => setOpenDropdown(null)}
                   >
-                    <button className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1 relative group whitespace-nowrap">
-                      <span className="relative z-10">{category.name}</span>
-                      {category.subcategories &&
-                        category.subcategories.length > 0 && (
+                    {category.subcategories && category.subcategories.length > 0 ? (
+                      // Categoría CON subcategorías - mostrar dropdown al hover
+                      <>
+                        <button 
+                          className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1 relative group whitespace-nowrap"
+                          onMouseEnter={() => setOpenDropdown(category.id)}
+                        >
+                          <span className="relative z-10">{category.name}</span>
                           <ChevronDown className="h-4 w-4 relative z-10 group-hover:text-red-600 transition-colors duration-200" />
-                        )}
-                      <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-red-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 rounded-md transition-all duration-200"></div>
-                    </button>
+                          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-red-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 rounded-md transition-all duration-200"></div>
+                        </button>
 
-                    {/* Dropdown Menu */}
-                    {category.subcategories &&
-                      category.subcategories.length > 0 && (
+                        {/* Dropdown Menu */}
                         <div
                           className={`absolute left-0 mt-1 w-56 rounded-lg shadow-xl bg-white border border-gray-200 transition-all duration-200 z-50 ${
                             openDropdown === category.id
                               ? "opacity-100 scale-100 visible"
                               : "opacity-0 scale-95 invisible"
                           }`}
+                          onMouseEnter={() => setOpenDropdown(category.id)}
+                          onMouseLeave={() => setOpenDropdown(null)}
                         >
                           <div className="py-3" role="menu">
                             {/* Category Title */}
@@ -181,7 +182,17 @@ export function Navbar() {
                             </div>
                           </div>
                         </div>
-                      )}
+                      </>
+                    ) : (
+                      // Categoría SIN subcategorías - enlace directo
+                      <Link
+                        href={`/productos?categoria=${category.id}`}
+                        className="text-gray-900 hover:text-orange-600 hover:bg-orange-50 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200 relative group whitespace-nowrap"
+                      >
+                        <span className="relative z-10">{category.name}</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-red-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 rounded-md transition-all duration-200"></div>
+                      </Link>
+                    )}
                   </div>
                 ))}
 

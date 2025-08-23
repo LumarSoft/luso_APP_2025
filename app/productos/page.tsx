@@ -43,8 +43,9 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
       try {
         setIsLoadingCategoryNames(true);
         const categoriesResponse = await categoryService.getAll();
-        if (categoriesResponse.success) {
-          const foundCategory = categoriesResponse.data.categories.find(
+        if (categoriesResponse.success && categoriesResponse.data) {
+          const categories = (categoriesResponse.data as { categories: Category[] }).categories;
+          const foundCategory = categories.find(
             (cat: Category) => cat.id.toString() === categoria
           );
 
@@ -55,11 +56,11 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
             if (subcategoria) {
               const subcategoriesResponse =
                 await categoryService.getSubcategories(categoria as string);
-              if (subcategoriesResponse.success) {
-                const foundSubcategory =
-                  subcategoriesResponse.data.subcategories.find(
-                    (sub: any) => sub.id.toString() === subcategoria
-                  );
+              if (subcategoriesResponse.success && subcategoriesResponse.data) {
+                const subcategories = (subcategoriesResponse.data as { subcategories: any[] }).subcategories;
+                const foundSubcategory = subcategories.find(
+                  (sub: any) => sub.id.toString() === subcategoria
+                );
                 if (foundSubcategory) {
                   setSubcategoryName(foundSubcategory.name);
                 }
@@ -92,14 +93,21 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         ...(subcategoria && { subcategory: subcategoria as string }),
       };
 
+      console.log("Loading products with params:", params);
+      console.log("URL params - categoria:", categoria, "subcategoria:", subcategoria, "search:", search);
+
       const response = await productService.getAll(params);
 
-      if (response.success) {
-        setProducts(response.data.products || []);
+      console.log("API response:", response);
 
-        if (response.data.pagination) {
-          setTotalPages(response.data.pagination.total_pages);
-          setTotalItems(response.data.pagination.total_items);
+      if (response.success && response.data) {
+        const data = response.data as { products: Product[]; pagination?: any };
+        setProducts(data.products || []);
+        console.log("Products loaded:", data.products?.length || 0);
+
+        if (data.pagination) {
+          setTotalPages(data.pagination.total_pages);
+          setTotalItems(data.pagination.total_items);
         }
       } else {
         setError("Error al cargar los productos");
